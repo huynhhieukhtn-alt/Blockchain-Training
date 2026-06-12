@@ -130,7 +130,7 @@
     .sheet.active { opacity: 1; pointer-events: all; transform: translateY(0); }
     
     #sheet-home { justify-content: center; align-items: center; text-align: center; }
-    #sheet-theory, #sheet-dashboard, #sheet-contact { overflow-y: auto; padding: 60px 80px; }
+    #sheet-theory, #sheet-hash, #sheet-signature, #sheet-dashboard, #sheet-contact { overflow-y: auto; padding: 60px 80px; }
     #sheet-demo { padding: 20px 30px; overflow: hidden; }
 
     .sheet-inner { max-width: 1100px; margin: 0 auto; width: 100%; position: relative; z-index: 2; }
@@ -289,6 +289,15 @@
     .rb-val { color: white; }
     .chain-arrow { color: var(--border-light); font-size: 2rem; flex-shrink: 0; }
 
+    /* HASH SIMULATOR */
+    .hash-step { display: flex; align-items: flex-start; gap: 16px; transition: opacity 0.5s ease; }
+    .hash-step-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--accent-blue); color: white; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; font-weight: 700; z-index: 1; box-shadow: 0 4px 15px rgba(0,0,0,0.3); flex-shrink: 0;}
+    .hash-step-content { transition: transform 0.3s; }
+    .hash-step-content:hover { transform: translateX(5px); }
+
+    @keyframes shiftBitsUp { 0% { transform: translateY(0); } 100% { transform: translateY(-16px); } }
+    @keyframes shiftBitsDown { 0% { transform: translateY(-16px); } 100% { transform: translateY(0); } }
+
     /* Toast */
     .toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 2000; display: flex; flex-direction: column; gap: 12px; }
     .toast { background: rgba(40,40,45,0.95); backdrop-filter: blur(10px); padding: 16px 24px; border-radius: 12px; font-size: 0.95rem; font-weight: 500; border: 1px solid var(--border-color); color: white; box-shadow: 0 10px 40px rgba(0,0,0,0.5);}
@@ -305,6 +314,8 @@
     <div class="nav-menu">
       <div class="nav-item active" onclick="switchSheet('home')" id="nav-home">Trang Chủ</div>
       <div class="nav-item" onclick="switchSheet('theory')" id="nav-theory">Kiến Thức Nền Tảng</div>
+      <div class="nav-item" onclick="switchSheet('hash')" id="nav-hash">Hàm Băm (Hash)</div>
+      <div class="nav-item" onclick="switchSheet('signature')" id="nav-signature">Chữ Ký Điện Tử</div>
       <div class="nav-item" onclick="switchSheet('demo')" id="nav-demo">Mô Phỏng Trực Quan</div>
       <div class="nav-item" onclick="switchSheet('dashboard')" id="nav-dashboard">Sổ Cái Hệ Thống</div>
       <div class="nav-item" onclick="switchSheet('contact')" id="nav-contact">Liên Hệ</div>
@@ -387,6 +398,440 @@
         
         <div style="text-align: center; margin-top: 20px;">
           <button class="btn btn-primary" style="padding: 16px 40px; font-size:1.1rem; border-radius: 30px;" onclick="switchSheet('demo')">Tiến vào Mô Phỏng Tương Tác</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HASH PAGE -->
+    <div id="sheet-hash" class="sheet">
+      <div class="sheet-inner">
+        <h1 class="page-title">Hàm Băm (Hash Functions)</h1>
+        <p class="page-subtitle">"Máy xay sinh tố" của thế giới Kỹ thuật số - Trái tim của Blockchain.</p>
+
+        <div class="theory-section">
+          <h2><span class="theory-icon" style="color:var(--accent-purple)">🌪️</span> 1. Hàm băm là gì?</h2>
+          <div class="story-box glass-card" style="border-left: 4px solid var(--accent-purple);">
+            <strong>Hàm băm (Hash Function)</strong> là một thuật toán toán học nhận đầu vào là bất kỳ dữ liệu nào (một chữ cái, một đoạn văn, hay một file video 10GB) và biến nó thành một chuỗi ký tự có <strong>độ dài cố định</strong> (gọi là Hash hoặc Digest).
+            <br><br>Hãy tưởng tượng nó như một cái máy xay sinh tố: Bạn bỏ quả táo hay quả dưa hấu vào, nó đều cho ra đúng 1 ly nước. Nhưng bạn <strong>không bao giờ có thể</strong> dùng ly nước đó để tạo lại hình dáng quả táo ban đầu.
+          </div>
+        </div>
+
+        <div class="theory-section">
+          <h2><span class="theory-icon" style="color:var(--accent-green)">⭐</span> 2. Năm Tính Chất Vàng</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 20px;">
+            <div class="glass-card" style="padding: 16px;">
+              <h4 style="color: white; margin-bottom: 8px;">1. Tất định (Deterministic)</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Cùng một input ban đầu, băm 1 triệu lần vẫn luôn cho ra cùng đúng một output đó. Không bao giờ sai lệch.</p>
+            </div>
+            <div class="glass-card" style="padding: 16px;">
+              <h4 style="color: white; margin-bottom: 8px;">2. Tính Một chiều (Pre-image Resistance)</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Rất dễ để tính Hash từ Input, nhưng từ Hash không thể nào (hoặc mất tỷ tỷ năm) để suy ngược lại Input ban đầu.</p>
+            </div>
+            <div class="glass-card" style="padding: 16px;">
+              <h4 style="color: white; margin-bottom: 8px;">3. Hiệu ứng tuyết lở (Avalanche Effect)</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Chỉ cần thay đổi 1 dấu phẩy trong văn bản đầu vào, Hash đầu ra sẽ thay đổi hoàn toàn đến mức không thể nhận diện.</p>
+            </div>
+            <div class="glass-card" style="padding: 16px;">
+              <h4 style="color: white; margin-bottom: 8px;">4. Kháng va chạm (Collision Resistance)</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Gần như không thể tìm thấy 2 văn bản khác nhau mà lại cho ra cùng một mã Hash.</p>
+            </div>
+            <div class="glass-card" style="padding: 16px;">
+              <h4 style="color: white; margin-bottom: 8px;">5. Tốc độ siêu tốc</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Thuật toán được thiết kế cực kỳ tối ưu để máy tính có thể băm hàng triệu đến hàng tỷ lần mỗi giây.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="theory-section">
+          <h2><span class="theory-icon" style="color:var(--accent-blue)">📈</span> 3. Các loại Hàm Băm và Sự tiến hóa</h2>
+          <div class="glass-card" style="padding: 24px; overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 600px;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.9rem;">
+                  <th style="padding: 12px;">Thuật toán</th>
+                  <th style="padding: 12px;">Năm ra mắt</th>
+                  <th style="padding: 12px;">Độ dài Output</th>
+                  <th style="padding: 12px;">Trạng thái Hiện tại</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <td style="padding: 12px; font-weight: 600; color: white;">MD5</td>
+                  <td style="padding: 12px; color: var(--text-muted);">1991</td>
+                  <td style="padding: 12px; color: var(--accent-orange);" class="mono">128-bit</td>
+                  <td style="padding: 12px;"><span style="color: var(--accent-red); background: rgba(255,59,48,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">❌ Đã bị phá vỡ</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <td style="padding: 12px; font-weight: 600; color: white;">SHA-1</td>
+                  <td style="padding: 12px; color: var(--text-muted);">1995</td>
+                  <td style="padding: 12px; color: var(--accent-orange);" class="mono">160-bit</td>
+                  <td style="padding: 12px;"><span style="color: var(--accent-orange); background: rgba(247,147,26,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">⚠️ Nguy hiểm (Google phá 2017)</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <td style="padding: 12px; font-weight: 600; color: white;">SHA-256</td>
+                  <td style="padding: 12px; color: var(--text-muted);">2001</td>
+                  <td style="padding: 12px; color: var(--accent-green);" class="mono">256-bit</td>
+                  <td style="padding: 12px;"><span style="color: var(--accent-green); background: rgba(52,199,89,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">✅ An toàn tuyệt đối (Bitcoin dùng)</span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px; font-weight: 600; color: white;">SHA-3</td>
+                  <td style="padding: 12px; color: var(--text-muted);">2015</td>
+                  <td style="padding: 12px; color: var(--accent-blue);" class="mono">Tùy biến</td>
+                  <td style="padding: 12px;"><span style="color: var(--accent-green); background: rgba(52,199,89,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">✅ Chuẩn tương lai (Kiến trúc Sponge)</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- INTERACTIVE HASH SIMULATOR -->
+        <h2 style="font-size: 1.5rem; margin-bottom: 20px; color: white; margin-top: 50px;">4. Trình Mô Phỏng: Từng Bước Băm Dữ Liệu</h2>
+        
+        <div class="glass-card" style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+          
+          <div style="display: flex; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+            <button id="btnHashOption1" class="btn" style="flex: 1; background: var(--accent-blue); color: white; border: 1px solid var(--accent-blue);" onclick="switchHashOption(1)">
+              Băm tiêu chuẩn (SHA-256)
+            </button>
+            <button id="btnHashOption2" class="btn" style="flex: 1; background: transparent; color: var(--text-muted); border: 1px solid var(--border-color);" onclick="switchHashOption(2)">
+              Băm lên Đường Cong (Hash-To-Curve)
+            </button>
+          </div>
+
+          <div style="background: rgba(41,151,255,0.1); border-left: 3px solid var(--accent-blue); padding: 12px 16px; color: white; font-size: 0.9rem; line-height: 1.5;" id="hashOpt1Desc">
+            Hãy nhập bất kỳ văn bản nào vào ô bên dưới. Thuật toán sẽ trải qua các bước cố định để tạo ra chuỗi Hash SHA-256 dài đúng 64 ký tự Hexadecimal.
+          </div>
+          
+          <div style="background: rgba(191,90,242,0.1); border-left: 3px solid var(--accent-purple); padding: 12px 16px; color: white; font-size: 0.9rem; line-height: 1.5; display: none;" id="hashOpt2Desc">
+            <strong>Băm lên Đường Cong:</strong> Biến một văn bản thành 1 tọa độ <code>(X, Y)</code> nằm chính xác trên đồ thị Elliptic. Phương pháp này dùng trong các giao thức Mật mã tiên tiến (VD: Zero-Knowledge Proof).
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <label style="color: var(--text-muted); font-weight: 600; font-size: 0.9rem;">Dữ liệu đầu vào (Input):</label>
+            <textarea id="hashSimInput" rows="3" placeholder="Nhập văn bản (Ví dụ: abc)" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--border-color); color:white; font-size:1rem; border-radius:10px; font-family:'Inter'; transition: border 0.3s;"></textarea>
+          </div>
+
+          <button class="btn btn-orange" id="btnRunHash" onclick="runHashSimulation()" style="width: 200px; padding: 14px; font-size: 1rem; align-self: center;">🔄 Bắt đầu Băm</button>
+
+          <!-- Step-by-step visualization for Option 1 -->
+          <div id="hashSimFlow" style="display: none; flex-direction: column; gap: 16px; margin-top: 10px; position: relative;">
+            <div style="position: absolute; top: 0; bottom: 0; left: 24px; width: 2px; background: rgba(255,255,255,0.1); z-index: 0;"></div>
+            
+            <div class="hash-step" id="hs-step1" style="opacity: 0;">
+              <div class="hash-step-icon">1</div>
+              <div class="hash-step-content glass-card" style="flex: 1; padding: 16px;">
+                <h4 style="color: white; margin-bottom: 6px;">Bước 1: Chuyển đổi nhị phân (Binary)</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Máy tính không hiểu chữ cái, nó đổi mọi thứ ra số 0 và 1 (Mã ASCII).</p>
+                <div id="hs-bin-out" class="mono" style="font-size: 0.8rem; color: var(--accent-blue); word-break: break-all; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px;"></div>
+              </div>
+            </div>
+
+            <div class="hash-step" id="hs-step2" style="opacity: 0;">
+              <div class="hash-step-icon" style="background: var(--accent-purple);">2</div>
+              <div class="hash-step-content glass-card" style="flex: 1; padding: 16px;">
+                <h4 style="color: white; margin-bottom: 6px;">Bước 2: Nêm nếm thêm bit (Padding)</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Thuật toán yêu cầu dữ liệu phải có chiều dài là bội số của 512. Nếu thiếu, nó tự động bù thêm số 1 và hàng loạt số 0, cộng với chiều dài thực tế ở cuối.</p>
+                <div id="hs-pad-out" class="mono" style="font-size: 0.8rem; color: var(--accent-purple); word-break: break-all; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px;"></div>
+              </div>
+            </div>
+
+            <div class="hash-step" id="hs-step3" style="opacity: 0;">
+              <div class="hash-step-icon" style="background: var(--accent-orange);">3</div>
+              <div class="hash-step-content glass-card" style="flex: 1; padding: 16px;">
+                <h4 style="color: white; margin-bottom: 6px;">Bước 3: Hàm Nhào Trộn (Compression Function - 64 Vòng)</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Dữ liệu bị băm vằm, xáo trộn (XOR, AND, dịch bit) qua 64 vòng lặp khép kín. Đây là nơi phép màu Tuyết lở (Avalanche Effect) xảy ra!</p>
+                <div style="background: rgba(247,147,26,0.1); border-left: 3px solid var(--accent-orange); padding: 10px; margin-bottom: 12px; font-size: 0.85rem; color: #fff;">
+                  <strong>Tại sao KHÔNG THỂ đảo ngược?</strong> Vì thuật toán sử dụng phép cộng tràn bit (Modulo 2³²) và phép dịch bit, làm <strong>mất mát dữ liệu gốc</strong> vĩnh viễn. Giống như bạn biết <code>A + B = 10</code>, bạn không thể tìm chính xác A và B là bao nhiêu.
+                </div>
+                <div style="display: flex; justify-content: center; margin: 12px 0;">
+                  <div style="display:flex; gap:8px; overflow:hidden; font-family:'JetBrains Mono'; font-size:0.85rem; background:rgba(0,0,0,0.5); padding:10px 16px; border-radius:8px; border:1px solid rgba(247,147,26,0.3); height:60px; align-items:center;">
+                    <div style="color:var(--accent-orange); animation: shiftBitsUp 0.8s infinite linear; display:flex; flex-direction:column; line-height:1.2;"><span>1011</span><span>0100</span><span>1101</span><span>0010</span></div>
+                    <div style="color:var(--accent-red); animation: shiftBitsDown 1s infinite linear; display:flex; flex-direction:column; line-height:1.2;"><span>0101</span><span>1010</span><span>1111</span><span>0000</span></div>
+                    <div style="color:var(--accent-green); animation: shiftBitsUp 0.6s infinite linear; display:flex; flex-direction:column; line-height:1.2;"><span>1100</span><span>0011</span><span>1001</span><span>0110</span></div>
+                    <div style="color:var(--accent-purple); animation: shiftBitsDown 0.9s infinite linear; display:flex; flex-direction:column; line-height:1.2;"><span>1000</span><span>0111</span><span>0010</span><span>1101</span></div>
+                  </div>
+                </div>
+                <div class="sig-formula" style="color: var(--accent-orange); border-color: rgba(247,147,26,0.3); background: rgba(247,147,26,0.1);">Ch, Maj, Σ0, Σ1, σ0, σ1 (Các toán tử Logic)</div>
+              </div>
+            </div>
+
+            <div class="hash-step" id="hs-step4" style="opacity: 0;">
+              <div class="hash-step-icon" style="background: var(--accent-green); box-shadow: 0 0 15px rgba(52,199,89,0.5);">🏁</div>
+              <div class="hash-step-content glass-card" style="flex: 1; padding: 16px; border: 2px solid var(--accent-green); background: rgba(52,199,89,0.05);">
+                <h4 style="color: var(--accent-green); margin-bottom: 6px;">Kết quả: Chuỗi Hash (256-bit / 64 Hex)</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Chuỗi cuối cùng được xuất ra dưới dạng hệ cơ số 16 (Hexadecimal) cho con người dễ đọc.</p>
+                <div id="hs-final-out" class="mono" style="font-size: 1.1rem; color: white; word-break: break-all; background: rgba(0,0,0,0.6); padding: 16px; border-radius: 8px; text-align: center; letter-spacing: 1px; margin-bottom: 12px;"></div>
+                <div style="background: rgba(52,199,89,0.1); border-left: 3px solid var(--accent-green); padding: 10px; font-size: 0.85rem; color: #fff;">
+                  <strong>Tại sao DỄ KIỂM TRA <code>f(x)</code>?</strong> Vì bản chất thuật toán chỉ là các phép toán logic cơ bản. Máy tính đi theo một chiều <strong>từ trên xuống dưới</strong> để tính toán mất chưa tới 0.001 giây. Nhờ thế người xác thực kiểm tra lại cực kỳ nhanh!
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Step-by-step visualization for Option 2 (Hash to Curve) -->
+          <div id="hashCurveFlow" style="display: none; flex-direction: column; gap: 16px; margin-top: 10px; position: relative;">
+            <div style="position: absolute; top: 0; bottom: 0; left: 24px; width: 2px; background: rgba(255,255,255,0.1); z-index: 0;"></div>
+            
+            <div class="hash-step" id="hc-step1" style="opacity: 0;">
+              <div class="hash-step-icon">1</div>
+              <div class="hash-step-content glass-card" style="flex: 1; padding: 16px;">
+                <h4 style="color: white; margin-bottom: 6px;">Bước 1: Băm văn bản ra số nguyên (X)</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Văn bản được băm (SHA-256) và chuyển thành 1 con số nguyên X trên trục hoành của đồ thị.</p>
+                <div id="hc-x-out" class="mono" style="font-size: 1rem; color: var(--accent-blue); background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px;">X = ...</div>
+              </div>
+            </div>
+
+            <div class="hash-step" id="hc-step2" style="opacity: 0;">
+              <div class="hash-step-icon" style="background: var(--accent-purple);">2</div>
+              <div class="hash-step-content glass-card" style="flex: 1; padding: 16px;">
+                <h4 style="color: white; margin-bottom: 6px;">Bước 2: Tìm tung độ (Y) trên đồ thị</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Thay số X vào phương trình <code>y² = x³ - 3x + 3</code>. Nếu tìm được Y hợp lệ (không bị âm căn), ta được một Điểm. Nếu không, máy tính tự động tăng biến đếm (X+1, X+2...) cho tới khi tìm được.</p>
+                <div id="hc-y-out" class="mono" style="font-size: 0.9rem; color: var(--accent-purple); background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px;">Đang tìm Y...</div>
+              </div>
+            </div>
+
+            <div class="hash-step" id="hc-step3" style="opacity: 0;">
+              <div class="hash-step-icon" style="background: var(--accent-green); box-shadow: 0 0 15px rgba(52,199,89,0.5);">🏁</div>
+              <div class="hash-step-content glass-card" style="flex: 1; padding: 16px; border: 2px solid var(--accent-green); background: rgba(52,199,89,0.05); display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                  <h4 style="color: var(--accent-green); margin-bottom: 6px;">Kết quả: Ánh xạ thành công Tọa Độ (X, Y)</h4>
+                  <div id="hc-final-out" class="mono" style="font-size: 1.1rem; color: white; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 8px; letter-spacing: 1px; margin-bottom: 8px;">(X, Y) = ...</div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Chuỗi Hash (Chuẩn nén Hexadecimal 02/03 + X):</div>
+                  <div id="hc-hash-out" class="mono" style="font-size: 0.85rem; color: var(--accent-green); background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px; word-break: break-all;">...</div>
+                </div>
+                <div style="width: 150px; height: 150px; background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid var(--border-color); position: relative;">
+                  <canvas id="hashCurveCanvas" width="150" height="150" style="background: white; border-radius: 8px;"></canvas>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ELLIPTIC CURVE SIMULATION -->
+        <h2 style="font-size: 1.5rem; margin-bottom: 20px; color: white; margin-top: 50px;">5. Đường Cong Elliptic (ECC) - Bí thuật sinh Cặp Khóa</h2>
+        <div class="glass-card" style="padding: 24px; display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px;">
+          <div style="background: rgba(191,90,242,0.1); border-left: 3px solid var(--accent-purple); padding: 12px 16px; color: white; font-size: 0.9rem; line-height: 1.5;">
+            Nếu Hàm băm (SHA-256) dùng để bảo vệ Dữ liệu, thì <strong>Đường cong Elliptic (secp256k1)</strong> dùng để sinh ra cặp khóa (Private/Public Key). Bitcoin sử dụng phương trình <code>y² = x³ + 7</code>. Giống như hàm băm, việc "Nhân điểm" trên đường cong này là bài toán <strong>chỉ đi được một chiều</strong>: Đi từ Private Key để tìm Public Key thì cực nhanh, nhưng làm ngược lại thì vô phương!
+          </div>
+
+          <div style="display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
+            
+            <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+              <h3 style="font-size: 1rem; color: white; margin-bottom: 10px;">Phương trình <code style="color:var(--accent-purple);">y² = x³ - 3x + 3</code> (Mô phỏng)</h3>
+              <canvas id="eccCanvas" width="300" height="300" style="background: white; border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);"></canvas>
+            </div>
+
+            <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 16px;">
+              <div>
+                <h4 style="color: var(--text-main); margin-bottom: 8px;">Quy tắc Cộng Điểm (Point Addition)</h4>
+                <ul style="color: var(--text-muted); font-size: 0.85rem; padding-left: 20px; line-height: 1.6;">
+                  <li>Chọn điểm G (Generator Point).</li>
+                  <li>Kẻ tiếp tuyến tại G, cắt đường cong tại điểm thứ 3.</li>
+                  <li>Lấy đối xứng điểm đó qua trục hoành, ta được <strong>2G</strong>.</li>
+                  <li>Tiếp tục làm thế để tính <strong>3G, 4G...</strong></li>
+                </ul>
+              </div>
+              
+              <div class="glass-card" style="padding: 16px; background: rgba(255,255,255,0.03);">
+                <div style="margin-bottom: 12px; font-size: 0.85rem; color: var(--accent-orange);">
+                  <strong style="color:white;">Private Key (k):</strong> Số lần lặp lại phép nhân (Rất lớn).<br>
+                  <strong style="color:white;">Public Key (K):</strong> Điểm cuối cùng trên đồ thị. <br>
+                  Công thức: <code class="mono" style="font-size:0.9rem; background:rgba(0,0,0,0.5); padding:4px; border-radius:4px;">K = k * G</code>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <button class="btn" onclick="runECCSimulation('doubling')" style="width: 100%; padding: 12px; font-size: 0.9rem; background: rgba(191,90,242,0.2); border: 1px solid var(--accent-purple); color: white;">
+                    ▶ Điểm Nhân Đôi (Point Doubling): G + G = 2G
+                  </button>
+                  <button class="btn" onclick="runECCSimulation('addition')" style="width: 100%; padding: 12px; font-size: 0.9rem; background: rgba(41,151,255,0.2); border: 1px solid var(--accent-blue); color: white;">
+                    ▶ Cộng Hai Điểm (Point Addition): P + Q = R
+                  </button>
+                </div>
+              </div>
+
+              <div id="eccResultBox" style="display:none; padding: 16px; background: rgba(191,90,242,0.15); border: 1px solid var(--accent-purple); border-radius: 12px;">
+                <span style="font-weight: 700; color: white;" id="eccResultTitle">Kết quả: Đã tìm ra 2G</span><br>
+                <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; display: block;" id="eccResultDesc">Máy tính có thể lặp lại phép này tỷ tỷ lần cực nhanh để ra Public Key. Nhưng nếu chỉ đưa Public Key (điểm K) và điểm G, đố ai biết đã lặp lại bao nhiêu lần (k) để quay ngược lại Private Key! (Bài toán Logarit rời rạc).</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SIGNATURE PAGE -->
+    <div id="sheet-signature" class="sheet">
+      <div class="sheet-inner">
+        <h1 class="page-title">Chữ Ký Điện Tử (Digital Signature)</h1>
+        <p class="page-subtitle">Công nghệ đằng sau sự bảo mật tuyệt đối của Blockchain.</p>
+
+        <!-- EXTENDED THEORY SECTION FOR DIGITAL SIGNATURES -->
+        <div class="theory-section" style="margin-bottom: 40px; margin-top: 30px;">
+          <h2><span class="theory-icon" style="color:var(--accent-blue)">✒️</span> 1. Bản chất của Chữ Ký Điện Tử</h2>
+          <div class="story-box glass-card" style="border-left: 4px solid var(--accent-blue);">
+            Khác với chữ ký viết tay có thể bị scan hoặc sao chép giả mạo, <strong>Chữ Ký Điện Tử (Digital Signature)</strong> là một bằng chứng toán học không thể bị phá vỡ. Nó giải quyết triệt để 2 bài toán cốt lõi trong giao dịch điện tử:
+            <br><br>• <strong>Tính Xác Thực (Authenticity):</strong> Chắc chắn 100% người gửi là ai.
+            <br>• <strong>Tính Toàn Vẹn (Integrity):</strong> Đảm bảo nội dung văn bản không bị hacker sửa đổi trên đường truyền.
+          </div>
+        </div>
+
+        <div class="theory-section" style="margin-bottom: 40px;">
+          <h2><span class="theory-icon" style="color:var(--accent-orange)">🔑</span> 2. Cặp Khóa Bất Đối Xứng (Asymmetric Cryptography)</h2>
+          <div class="story-box glass-card" style="border-left: 4px solid var(--accent-orange);">
+            Mọi hệ thống chữ ký điện tử đều dựa trên một cặp khóa sinh ra cùng nhau, có liên hệ mật thiết về mặt toán học nhưng <strong>hoàn toàn không thể suy luận ngược từ khóa này ra khóa kia</strong>:
+            <br><br>• <strong>Private Key (Khóa Bí Mật):</strong> Giống như con dấu cá nhân của bạn. Chỉ bạn được giữ và dùng nó để "đóng dấu" (ký) lên văn bản.
+            <br>• <strong>Public Key (Khóa Công Khai):</strong> Giống như tờ giấy chứa mẫu chữ ký của bạn được phát cho tất cả mọi người. Bất kỳ ai cũng có thể dùng nó để soi chiếu và kiểm tra xem con dấu trên văn bản có đúng là của bạn hay không.
+          </div>
+        </div>
+
+        <div class="theory-section" style="margin-bottom: 50px;">
+          <h2><span class="theory-icon" style="color:var(--accent-green)">🛡️</span> 3. Các Thuật Toán Mã Hóa Phổ Biến Nhất Thế Giới</h2>
+          <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 1.05rem;">Theo dòng chảy lịch sử, nhân loại đã không ngừng nâng cấp các thuật toán sinh cặp khóa này để chống lại sự phát triển của máy tính lượng tử và siêu máy tính:</p>
+          
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+            <div class="glass-card" style="padding: 24px;">
+              <h3 style="color: var(--accent-blue); margin-bottom: 12px; font-size: 1.3rem;">1. RSA (Năm 1977)</h3>
+              <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">Dựa trên bài toán phân tích thừa số nguyên tố. Là tượng đài vĩ đại nhất của bảo mật Internet truyền thống (Banking, SSL/TLS).</p>
+              <div style="font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+                <div style="margin-bottom: 6px;"><span style="color:var(--accent-red)">⚠️ Nhược điểm:</span> Cần độ dài khóa khổng lồ (3072-bit) để an toàn. Chạy chậm trên thiết bị yếu.</div>
+              </div>
+            </div>
+            
+            <div class="glass-card" style="padding: 24px; border-color: rgba(247,147,26,0.3);">
+              <h3 style="color: var(--accent-orange); margin-bottom: 12px; font-size: 1.3rem;">2. ECDSA (Bitcoin)</h3>
+              <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">Sử dụng hình học Đường cong Elliptic. Chuẩn mực hiện đại mang lại mức bảo mật ngang RSA nhưng khóa chỉ ngắn bằng 1/10.</p>
+              <div style="font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+                <div style="margin-bottom: 6px;"><span style="color:var(--accent-red)">⚠️ Nhược điểm:</span> Dễ bị hack Private Key nếu hệ thống tạo số ngẫu nhiên (RNG) bị lỗi hoặc đoán trước được.</div>
+              </div>
+            </div>
+            
+            <div class="glass-card" style="padding: 24px; border-color: rgba(191,90,242,0.3);">
+              <h3 style="color: var(--accent-purple); margin-bottom: 12px; font-size: 1.3rem;">3. EdDSA (Ed25519)</h3>
+              <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">Kỳ quan mã hóa thế hệ mới. Không cần dùng đến số ngẫu nhiên (Deterministic), loại bỏ hoàn toàn điểm yếu chí mạng của ECDSA.</p>
+              <div style="font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+                <div style="margin-bottom: 6px;"><span style="color:var(--accent-green)">✅ Ưu điểm:</span> Tốc độ ký siêu nhanh, chống tấn công Side-channel. Dùng trong Solana, Cardano.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INTERACTIVE VISUAL SANDBOX -->
+        <style>
+          @keyframes flyRight { 0%{transform:translateX(-60px) scale(0.8);opacity:0} 100%{transform:translateX(0) scale(1);opacity:1} }
+          @keyframes flyLeft { 0%{transform:translateX(60px) scale(0.8);opacity:0} 100%{transform:translateX(0) scale(1);opacity:1} }
+          @keyframes pulseGlow { 0%,100%{box-shadow:0 0 5px rgba(247,147,26,0.3)} 50%{box-shadow:0 0 20px rgba(247,147,26,0.7)} }
+          @keyframes fadeSlideUp { 0%{opacity:0;transform:translateY(10px)} 100%{opacity:1;transform:translateY(0)} }
+          @keyframes typeReveal { 0%{max-width:0;opacity:0} 100%{max-width:500px;opacity:1} }
+          .sig-formula { font-family:'JetBrains Mono',monospace; font-size:0.75rem; background:rgba(191,90,242,0.15); border:1px solid rgba(191,90,242,0.3); padding:6px 10px; border-radius:8px; color:#bf5af2; margin-top:6px; text-align:center; }
+          .sig-step { display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; animation: fadeSlideUp 0.4s ease-out forwards; opacity:0; }
+          .sig-step-num { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; flex-shrink:0; }
+          .sig-step-text { font-size:0.78rem; color:var(--text-muted); line-height:1.4; }
+          .sig-step-text strong { color:white; }
+          .key-display { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:5px 8px; border-radius:6px; word-break:break-all; }
+          .anim-packet-fly { animation: pulseGlow 1.5s ease-in-out infinite, flyRight 0.6s ease-out; }
+          .anim-verify-fly { animation: flyLeft 0.5s ease-out; }
+        </style>
+
+        <h2 style="font-size: 1.5rem; margin-bottom: 20px; color: white;">4. Trình Mô Phỏng: Phân Tích Đường Truyền & Xác Thực</h2>
+        
+        <div style="display: flex; gap: 20px; align-items: stretch; margin-bottom: 50px;">
+          <!-- Left: Scenarios Menu -->
+          <div class="glass-card" style="width: 260px; padding: 16px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; overflow-y: auto; max-height: 750px;">
+            <h3 style="color: white; font-size: 1rem; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">10 Kịch Bản Minh Họa</h3>
+            <button class="btn btn-secondary scenario-btn" onclick="loadScenario(1)" style="justify-content:flex-start; text-align:left; font-size:0.8rem; padding:8px 12px;">1. Ký chuẩn (Happy Path)</button>
+            <button class="btn btn-secondary scenario-btn" onclick="loadScenario(2)" style="justify-content:flex-start; text-align:left; font-size:0.8rem; padding:8px 12px;">2. Hacker sửa Nội dung</button>
+            <button class="btn btn-secondary scenario-btn" onclick="loadScenario(3)" style="justify-content:flex-start; text-align:left; font-size:0.8rem; padding:8px 12px;">3. Hacker sửa Chữ ký</button>
+            <button class="btn btn-secondary scenario-btn" onclick="loadScenario(4)" style="justify-content:flex-start; text-align:left; font-size:0.8rem; padding:8px 12px;">4. Kẻ gian Ký thay</button>
+            <button class="btn btn-secondary scenario-btn" onclick="loadScenario(5)" style="justify-content:flex-start; text-align:left; font-size:0.8rem; padding:8px 12px;">5. Tái sử dụng Chữ ký</button>
+            <button class="btn btn-secondary scenario-btn" onclick="loadScenario(6)" style="justify-content:flex-start; text-align:left; font-size:0.8rem; padding:8px 12px;">6. Chống chối bỏ</button>
+            <button class="btn btn-secondary scenario-btn" onclick="loadScenario(7)" style="justify-content:flex-start; text-align:left; font-size:0.8rem; padding:8px 12px;">7. Hiệu ứng cánh bướm</button>
+            <button class="btn btn-secondary scenario-btn" onclick="loadScenario(8)" style="justify-content:flex-start; text-align:left; font-size:0.8rem; padding:8px 12px;">8. Tráo Public Key</button>
+            <button class="btn btn-secondary scenario-btn" onclick="loadScenario(9)" style="justify-content:flex-start; text-align:left; font-size:0.8rem; padding:8px 12px;">9. Mất Private Key</button>
+            <button class="btn btn-secondary scenario-btn" onclick="loadScenario(10)" style="justify-content:flex-start; text-align:left; font-size:0.8rem; padding:8px 12px;">10. Xác thực tốc độ cao</button>
+          </div>
+
+          <!-- Right: Visual Sandbox (Alice -> Network -> Bob) -->
+          <div class="glass-card" style="flex: 1; padding: 0; display: flex; flex-direction: column; overflow: hidden; background: rgba(0,0,0,0.2);">
+            
+            <div id="scenarioDesc" style="background: rgba(41,151,255,0.1); border-bottom: 1px solid rgba(41,151,255,0.3); padding: 14px 20px; color: white; font-size: 0.9rem; line-height: 1.5;">
+              <strong>Hướng dẫn:</strong> Chọn kịch bản bên trái. Đọc các bước mô tả, sau đó tự tay thao tác từng nút để chạy animation minh họa thuật toán.
+            </div>
+
+            <!-- The Flow Container -->
+            <div style="display: flex; flex: 1; padding: 20px; gap: 14px; position: relative; min-height: 520px;">
+              
+              <!-- ZONE A: ALICE (SENDER) -->
+              <div id="zoneAlice" style="flex: 1; background: rgba(255,255,255,0.02); border: 1px dashed rgba(41,151,255,0.4); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; z-index: 2;">
+                <h3 style="color: var(--accent-blue); text-align: center; margin-bottom: 12px; font-size:1rem;">👩 BÊN GỬI (ALICE)</h3>
+                <button class="btn" style="background:rgba(41,151,255,0.15); padding: 7px; font-size: 0.78rem; margin-bottom: 10px; border:1px solid rgba(41,151,255,0.3); color:var(--accent-blue);" onclick="simGenerateKeys()">🔑 Tự Sinh Cặp Khóa Mới</button>
+                
+                <div style="margin-bottom: 6px;">
+                  <span style="font-size:0.72rem; color:var(--accent-red); font-weight:600;">🔒 Private Key (Bí mật):</span>
+                  <div id="dispPrivKey" class="key-display" style="background:rgba(255,59,48,0.1); border:1px solid rgba(255,59,48,0.25); color:#ff6b6b; margin-top:3px;">—</div>
+                  <input type="hidden" id="simPrivKey">
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <span style="font-size:0.72rem; color:var(--accent-green); font-weight:600;">🔓 Public Key (Công khai):</span>
+                  <div id="dispPubKey" class="key-display" style="background:rgba(52,199,89,0.1); border:1px solid rgba(52,199,89,0.25); color:#5fd97b; margin-top:3px;">—</div>
+                  <input type="hidden" id="simPubKey">
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                  <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600;">📄 Văn Bản Gốc:</span>
+                  <textarea id="simMessage" rows="2" style="width:100%; padding:7px; background:rgba(0,0,0,0.5); border:1px solid var(--border-color); color:white; font-size:0.82rem; border-radius:6px; font-family:'Inter'; margin-top:3px;"></textarea>
+                </div>
+
+                <button class="btn btn-orange" onclick="runSignAnimation()" style="width:100%; padding: 10px; margin-top: auto; font-size:0.9rem;">✍️ Bước 1: Ký Lệnh</button>
+                
+                <!-- Signing Math Steps (animated) -->
+                <div id="animSignMath" style="display: none; flex-direction: column; margin-top: 12px; gap: 4px;"></div>
+              </div>
+
+              <!-- ZONE B: NETWORK & HACKER -->
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                <div style="position: absolute; top: 50%; left: 0; width: 100%; border-top: 2px dashed rgba(255,255,255,0.15); z-index: 0;"></div>
+                
+                <h3 style="color: var(--accent-red); margin-bottom: 20px; z-index: 2; position: absolute; top: 0; font-size:1rem; text-align:center;">🌐 ĐƯỜNG TRUYỀN<br><span style="font-size: 0.72rem; color: var(--text-muted); font-weight:normal;">(Hacker có thể can thiệp ở đây)</span></h3>
+                
+                <!-- Floating Data Packet -->
+                <div id="dataPacket" style="background: rgba(30,30,35,0.95); border: 2px solid var(--accent-orange); border-radius: 12px; padding: 14px; width: 96%; z-index: 2; box-shadow: 0 8px 30px rgba(0,0,0,0.6); opacity: 0; transform: translateX(-40px); transition: all 0.5s;">
+                  <div style="text-align: center; font-weight: 600; font-size: 0.82rem; color: var(--accent-orange); margin-bottom: 10px;">📦 GÓI DỮ LIỆU ĐANG BAY</div>
+                  
+                  <div style="margin-bottom: 7px;">
+                    <span style="font-size:0.72rem; color:var(--text-muted);">[1] Văn Bản <span style='color:var(--accent-red);font-weight:600;'>(Hacker có thể sửa!)</span>:</span>
+                    <input type="text" id="netMessage" style="width:100%; padding:5px 7px; background:rgba(255,255,255,0.08); border:1px solid var(--border-light); color:white; font-size:0.78rem; border-radius:6px; font-family:'Inter'; margin-top:2px;">
+                  </div>
+                  
+                  <div style="margin-bottom: 7px;">
+                    <span style="font-size:0.72rem; color:var(--text-muted);">[2] Chữ Ký Số <span style='color:var(--accent-red);font-weight:600;'>(Có thể sửa!)</span>:</span>
+                    <div id="netSigDisplay" class="key-display" style="background:rgba(255,255,255,0.08); border:1px solid var(--border-light); color:var(--accent-orange); margin-top:2px; cursor:pointer;" onclick="toggleSigEdit()" title="Click để sửa (giả lập Hacker)">—</div>
+                    <input type="text" id="netSignature" class="mono" style="display:none; width:100%; padding:5px 7px; background:rgba(255,255,255,0.08); border:1px solid var(--accent-red); color:var(--accent-orange); font-size:0.72rem; border-radius:6px; margin-top:2px;" onblur="closeSigEdit()">
+                  </div>
+
+                  <div>
+                    <span style="font-size:0.72rem; color:var(--text-muted);">[3] Kèm Public Key (Để đối chiếu):</span>
+                    <div id="netPubKey" class="key-display" style="background:transparent; color:var(--accent-green); margin-top:2px;">—</div>
+                    <input type="hidden" id="netPubKeyFull">
+                  </div>
+                </div>
+              </div>
+
+              <!-- ZONE C: BOB (VERIFIER) -->
+              <div id="zoneBob" style="flex: 1.3; background: rgba(255,255,255,0.02); border: 1px dashed rgba(52,199,89,0.4); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; z-index: 2;">
+                <h3 style="color: var(--accent-green); text-align: center; margin-bottom: 12px; font-size:1rem;">👨 BÊN NHẬN (XÁC THỰC)</h3>
+                
+                <button class="btn btn-primary" onclick="runVerifyAnimation()" style="width:100%; padding: 10px; margin-bottom: 14px; font-size: 0.9rem;">🛡️ Bước 2: Nhận & Kiểm Tra</button>
+                
+                <!-- Verification Math Steps UI -->
+                <div id="animVerifyMath" style="display: none; flex-direction: column; flex: 1; gap: 6px;"></div>
+
+              </div>
+
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1059,6 +1504,647 @@
     function startNewLoop() { jumpToStep(1); renderOutboxCards(); }
 
     // =========================================================================
+    // DIGITAL SIGNATURE SANDBOX & SCENARIOS (VISUAL 3-ZONE FLOW v2)
+    // =========================================================================
+    let defPriv = randomHex(64);
+    let defPub = simpleHash('pub_' + defPriv).substring(0, 32);
+    let defMsg = "Tôi đồng ý mua nhà giá 5 tỷ";
+    let defHash = simpleHash(defMsg);
+    let defSig = simpleHash(defHash + defPriv);
+    let isPacketReady = false;
+
+    function truncKey(k, n=8) {
+      if (!k || k.length <= n*2+3) return k;
+      return k.substring(0, n) + '···' + k.substring(k.length - n);
+    }
+
+    function updateKeyDisplays() {
+      const priv = document.getElementById('simPrivKey').value;
+      const pub = document.getElementById('simPubKey').value;
+      document.getElementById('dispPrivKey').innerHTML = priv ? `<span title="${priv}">${truncKey(priv)}</span>` : '—';
+      document.getElementById('dispPubKey').innerHTML = pub ? `<span title="${pub}">${truncKey(pub)}</span>` : '—';
+    }
+
+    function updateNetPubDisplay() {
+      const v = document.getElementById('netPubKeyFull').value;
+      document.getElementById('netPubKey').innerHTML = v ? `<span title="${v}">${truncKey(v)}</span>` : '—';
+    }
+
+    function updateNetSigDisplay() {
+      const v = document.getElementById('netSignature').value;
+      document.getElementById('netSigDisplay').innerHTML = v ? `<span title="${v}">${truncKey(v)}</span>` : '—';
+    }
+
+    function toggleSigEdit() {
+      const disp = document.getElementById('netSigDisplay');
+      const inp = document.getElementById('netSignature');
+      disp.style.display = 'none';
+      inp.style.display = 'block';
+      inp.focus();
+    }
+
+    function closeSigEdit() {
+      const disp = document.getElementById('netSigDisplay');
+      const inp = document.getElementById('netSignature');
+      disp.style.display = 'block';
+      inp.style.display = 'none';
+      updateNetSigDisplay();
+    }
+
+    function resetFlowUI() {
+      const pkt = document.getElementById('dataPacket');
+      pkt.style.opacity = '0';
+      pkt.style.transform = 'translateX(-40px)';
+      pkt.classList.remove('anim-packet-fly');
+      document.getElementById('animSignMath').style.display = 'none';
+      document.getElementById('animSignMath').innerHTML = '';
+      document.getElementById('animVerifyMath').style.display = 'none';
+      document.getElementById('animVerifyMath').innerHTML = '';
+      isPacketReady = false;
+    }
+
+    function addSignStep(idx, html, delay) {
+      setTimeout(() => {
+        const box = document.getElementById('animSignMath');
+        const el = document.createElement('div');
+        el.className = 'sig-step';
+        el.style.animationDelay = '0s';
+        const colors = ['var(--accent-blue)','var(--accent-orange)','var(--accent-purple)','var(--accent-green)'];
+        el.innerHTML = `<div class="sig-step-num" style="background:${colors[idx%4]};color:#000;">${idx}</div><div class="sig-step-text">${html}</div>`;
+        box.appendChild(el);
+      }, delay);
+    }
+
+    function addVerifyStep(idx, html, delay) {
+      setTimeout(() => {
+        const box = document.getElementById('animVerifyMath');
+        const el = document.createElement('div');
+        el.className = 'sig-step';
+        el.style.animationDelay = '0s';
+        const colors = ['var(--accent-green)','var(--accent-blue)','var(--accent-purple)','var(--accent-orange)','var(--accent-green)'];
+        el.innerHTML = `<div class="sig-step-num" style="background:${colors[idx%5]};color:#000;">${idx}</div><div class="sig-step-text">${html}</div>`;
+        box.appendChild(el);
+      }, delay);
+    }
+
+    function loadScenario(id) {
+      resetFlowUI();
+      
+      const desc = document.getElementById('scenarioDesc');
+      const privEl = document.getElementById('simPrivKey');
+      const pubEl = document.getElementById('simPubKey');
+      const msgEl = document.getElementById('simMessage');
+
+      privEl.value = defPriv;
+      pubEl.value = defPub;
+      msgEl.value = defMsg;
+      updateKeyDisplays();
+
+      document.getElementById('netMessage').value = defMsg;
+      document.getElementById('netSignature').value = defSig;
+      document.getElementById('netPubKeyFull').value = defPub;
+      updateNetPubDisplay();
+      updateNetSigDisplay();
+
+      // Show packet for quick demo
+      const pkt = document.getElementById('dataPacket');
+      pkt.style.opacity = '1';
+      pkt.style.transform = 'translateX(0)';
+      isPacketReady = true;
+
+      if(id === 1) {
+        desc.innerHTML = `<strong>🟢 Kịch bản 1: Ký chuẩn (Happy Path)</strong><br>
+          <b>Ý nghĩa:</b> Một giao dịch hợp lệ hoàn hảo — Alice ký đúng, văn bản không bị sửa.<br>
+          <b>Các bước:</b> ① Quan sát Cặp Khóa & Văn Bản đã sẵn sàng ở BÊN GỬI → ② Gói Dữ Liệu đã bay ra mạng → ③ Bấm <strong>🛡️ Bước 2: Nhận & Kiểm Tra</strong> ở BÊN NHẬN → Xem Hash A khớp Hash B 100%.`;
+      } else if (id === 2) {
+        desc.innerHTML = `<strong>🔴 Kịch bản 2: Hacker sửa nội dung (Data Tampering)</strong><br>
+          <b>Ý nghĩa:</b> Chứng minh: Chỉ cần thay đổi 1 ký tự trong văn bản, Hash sẽ hoàn toàn khác → Chữ ký bị vô hiệu.<br>
+          <b>Các bước:</b> ① Nhìn ô [1] trên Đường Truyền: Hacker đã sửa "5 tỷ" → "50 tỷ" → ② Bấm <strong>🛡️ Kiểm Tra</strong> → ③ So sánh Hash A ≠ Hash B → BỊ TỪ CHỐI.`;
+        document.getElementById('netMessage').value = "Tôi đồng ý mua nhà giá 50 tỷ";
+      } else if (id === 3) {
+        desc.innerHTML = `<strong>🔴 Kịch bản 3: Hacker sửa Chữ ký (Signature Tampering)</strong><br>
+          <b>Ý nghĩa:</b> Dù chỉ sửa 1 ký tự cuối trong Chữ Ký, phép giải mã sẽ cho ra rác thay vì Hash hợp lệ.<br>
+          <b>Các bước:</b> ① Nhìn ô [2] trên Đường Truyền: ký tự cuối bị đổi thành "x" → ② Bấm <strong>🛡️ Kiểm Tra</strong> → ③ Hash B thành rác → BỊ TỪ CHỐI.`;
+        document.getElementById('netSignature').value = defSig.substring(0, defSig.length - 1) + 'x';
+        updateNetSigDisplay();
+      } else if (id === 4) {
+        desc.innerHTML = `<strong>🔴 Kịch bản 4: Kẻ gian Ký thay (Forgery — Sai Private Key)</strong><br>
+          <b>Ý nghĩa:</b> Hacker tạo Private Key riêng, ký văn bản giả danh Alice. Nhưng Public Key của Alice không khớp!<br>
+          <b>Các bước:</b> ① Nhìn Private Key ở BÊN GỬI: đã bị đổi sang key giả → ② Bấm <strong>✍️ Bước 1: Ký Lệnh</strong> → ③ Gói dữ liệu bay ra mạng → ④ Bấm <strong>🛡️ Kiểm Tra</strong> → Hash B ≠ Hash A.`;
+        privEl.value = randomHex(64);
+        updateKeyDisplays();
+        resetFlowUI();
+      } else if (id === 5) {
+        desc.innerHTML = `<strong>🔴 Kịch bản 5: Tái sử dụng Chữ ký (Replay Attack)</strong><br>
+          <b>Ý nghĩa:</b> Không thể copy chữ ký từ hợp đồng A dán sang hợp đồng B. Chữ ký số gắn liền với nội dung!<br>
+          <b>Các bước:</b> ① Nhìn ô [1] trên Đường Truyền: Hacker đổi thành "Chuyển Hacker 10 BTC" nhưng giữ nguyên Chữ Ký cũ → ② Bấm <strong>🛡️ Kiểm Tra</strong> → ③ Hash A (của VB mới) ≠ Hash B (từ chữ ký cũ).`;
+        document.getElementById('netMessage').value = "Chuyển Hacker 10 BTC";
+      } else if (id === 6) {
+        desc.innerHTML = `<strong>🟢 Kịch bản 6: Chống chối bỏ (Non-repudiation)</strong><br>
+          <b>Ý nghĩa:</b> Alice cãi: "Tôi không ký!". Nhưng thuật toán chứng minh chỉ ai có Private Key của Alice mới tạo ra Hash B khớp.<br>
+          <b>Các bước:</b> ① Bấm <strong>🛡️ Kiểm Tra</strong> → ② Hash A = Hash B → Thuật toán khẳng định: "Chỉ Private Key của Alice mới tạo ra được chữ ký này. Cô ta không thể chối cãi trước tòa."`;
+      } else if (id === 7) {
+        desc.innerHTML = `<strong>🟡 Kịch bản 7: Hiệu ứng cánh bướm (Avalanche Effect)</strong><br>
+          <b>Ý nghĩa:</b> Thay đổi 1 bit input → 50%+ output thay đổi. Không thể đoán ngược từ chữ ký ra nội dung.<br>
+          <b>Các bước:</b> ① Sửa 1 chữ cái trong Văn Bản Gốc (VD: viết hoa "Tôi" → "tôi") → ② Bấm <strong>✍️ Ký Lệnh</strong> → ③ Quan sát chữ ký mới hoàn toàn khác biệt so với cũ.`;
+        resetFlowUI();
+      } else if (id === 8) {
+        desc.innerHTML = `<strong>⚠️ Kịch bản 8: Tráo Public Key (Man-in-the-Middle)</strong><br>
+          <b>Ý nghĩa:</b> Hacker thay PubKey + Signature trên đường truyền bằng bộ của hắn. Xác thực sẽ XANH! → Blockchain cần PKI / Sổ cái minh bạch.<br>
+          <b>Các bước:</b> ① Nhìn ô [2] và [3] trên Đường Truyền: Cả Chữ Ký và Public Key đều đã bị Hacker đổi → ② Bấm <strong>🛡️ Kiểm Tra</strong> → ③ Hash A = Hash B → XANH! (đáng báo động).`;
+        const hackerPriv = randomHex(64);
+        const hackerPub = simpleHash('pub_' + hackerPriv).substring(0, 32);
+        const hackerSig = simpleHash(simpleHash(defMsg) + hackerPriv);
+        document.getElementById('netSignature').value = hackerSig;
+        updateNetSigDisplay();
+        document.getElementById('netPubKeyFull').value = hackerPub;
+        updateNetPubDisplay();
+      } else if (id === 9) {
+        desc.innerHTML = `<strong>🔴 Kịch bản 9: Mất / Sai Private Key</strong><br>
+          <b>Ý nghĩa:</b> Sai 1 ký tự Private Key = Chữ ký hoàn toàn vô nghĩa. Mất Private Key = Mất tài sản Blockchain vĩnh viễn.<br>
+          <b>Các bước:</b> ① Nhìn Private Key: ký tự cuối bị đổi thành "0" → ② Bấm <strong>✍️ Ký Lệnh</strong> → ③ Chữ ký sinh ra sai → ④ Bấm <strong>🛡️ Kiểm Tra</strong> → BỊ TỪ CHỐI.`;
+        privEl.value = defPriv.substring(0, defPriv.length - 1) + '0';
+        updateKeyDisplays();
+        resetFlowUI();
+      } else if (id === 10) {
+        desc.innerHTML = `<strong>⚡ Kịch bản 10: Tốc độ xử lý siêu tốc</strong><br>
+          <b>Ý nghĩa:</b> Máy tính chỉ cần 2 phép Hash + 1 phép So Sánh. Một Node Bitcoin quét ~100.000 chữ ký/giây.<br>
+          <b>Các bước:</b> ① Bấm <strong>🛡️ Kiểm Tra</strong> liên tục nhiều lần → Quan sát animation chạy gần như tức thì — đây là sức mạnh tính toán.`;
+      }
+      
+      const btns = document.querySelectorAll('.scenario-btn');
+      btns.forEach(b => { b.style.background = 'rgba(255,255,255,0.03)'; b.style.borderColor = 'transparent'; });
+      btns[id-1].style.background = 'rgba(41,151,255,0.12)';
+      btns[id-1].style.borderColor = 'var(--accent-blue)';
+    }
+
+    function simGenerateKeys() {
+      const priv = randomHex(64);
+      const pub = simpleHash('pub_' + priv).substring(0, 32);
+      document.getElementById('simPrivKey').value = priv;
+      document.getElementById('simPubKey').value = pub;
+      updateKeyDisplays();
+      resetFlowUI();
+      showToast('Đã tạo xong cặp khóa mới', 'success');
+    }
+
+    function runSignAnimation() {
+      const msg = document.getElementById('simMessage').value;
+      const priv = document.getElementById('simPrivKey').value;
+      const pub = document.getElementById('simPubKey').value;
+      
+      if (!priv) { showToast('Cần tạo cặp khóa trước!', 'error'); return; }
+      if (!msg) { showToast('Vui lòng nhập văn bản!', 'error'); return; }
+
+      const mathBox = document.getElementById('animSignMath');
+      mathBox.innerHTML = '';
+      mathBox.style.display = 'flex';
+      document.getElementById('animVerifyMath').style.display = 'none';
+      document.getElementById('animVerifyMath').innerHTML = '';
+
+      const hash = simpleHash(msg);
+      const signature = simpleHash(hash + priv);
+
+      addSignStep(1, `<strong>Băm văn bản:</strong> "${msg.substring(0,25)}${msg.length>25?'...':''}"<br>→ Hash = <code class="mono" style="color:var(--accent-blue);">${truncKey(hash)}</code>
+        <div class="sig-formula">Hash = SHA-256( Văn_Bản )</div>`, 0);
+
+      addSignStep(2, `<strong>Mã hóa Hash bằng Private Key:</strong><br>→ Signature = <code class="mono" style="color:var(--accent-orange);">${truncKey(signature)}</code>
+        <div class="sig-formula">Sig = Encrypt( Hash, PrivKey )</div>`, 600);
+
+      addSignStep(3, `<strong>Đóng gói & Gửi lên mạng:</strong><br>📄 Văn Bản + 🔏 Chữ Ký + 🔓 Public Key`, 1200);
+
+      setTimeout(() => {
+        document.getElementById('netMessage').value = msg;
+        document.getElementById('netSignature').value = signature;
+        updateNetSigDisplay();
+        document.getElementById('netPubKeyFull').value = pub;
+        updateNetPubDisplay();
+        
+        const packet = document.getElementById('dataPacket');
+        packet.style.opacity = '1';
+        packet.style.transform = 'translateX(0)';
+        packet.classList.add('anim-packet-fly');
+        isPacketReady = true;
+        
+        showToast('📦 Gói Dữ Liệu đã bay ra Internet!', 'success');
+      }, 1800);
+    }
+
+    function runVerifyAnimation() {
+      if (!isPacketReady) { showToast('Chưa có gói trên mạng! Bấm ✍️ Ký Lệnh trước.', 'error'); return; }
+
+      const netMsg = document.getElementById('netMessage').value;
+      const netSig = document.getElementById('netSignature').value;
+      const netPub = document.getElementById('netPubKeyFull').value;
+
+      const vBox = document.getElementById('animVerifyMath');
+      vBox.innerHTML = '';
+      vBox.style.display = 'flex';
+
+      const hashA = simpleHash(netMsg);
+
+      addVerifyStep(1, `<strong>Nhận gói dữ liệu từ mạng:</strong><br>📄 "${netMsg.substring(0,25)}${netMsg.length>25?'...':''}"<br>🔏 Sig = <code class="mono" style="color:var(--accent-orange);">${truncKey(netSig)}</code><br>🔓 PubKey = <code class="mono" style="color:var(--accent-green);">${truncKey(netPub)}</code>`, 0);
+
+      addVerifyStep(2, `<strong>Tính Hash A</strong> (Băm văn bản nhận được):<br>→ <span style="color:var(--accent-blue);font-weight:700;" class="mono">${hashA}</span>
+        <div class="sig-formula">Hash_A = SHA-256( Văn_Bản_Nhận )</div>`, 700);
+
+      // Math to decide Hash B
+      let expectedSigIfReal = '';
+      const alicePriv = document.getElementById('simPrivKey').value;
+      const derivedPub = simpleHash('pub_' + alicePriv).substring(0, 32);
+      if (derivedPub === netPub) {
+         expectedSigIfReal = simpleHash(simpleHash(netMsg) + alicePriv);
+      } else if (netPub === defPub) {
+         expectedSigIfReal = simpleHash(simpleHash(netMsg) + defPriv);
+      }
+      let hashB = '';
+      let isMatch = false;
+      if (netSig === expectedSigIfReal) {
+         hashB = hashA;
+         isMatch = true;
+      } else {
+         hashB = simpleHash(netSig + netPub + Math.random()).substring(0, 32);
+      }
+
+      addVerifyStep(3, `<strong>Tính Hash B</strong> (Giải mã Chữ Ký bằng Public Key):<br>→ <span style="color:var(--accent-purple);font-weight:700;" class="mono">${hashB}</span>
+        <div class="sig-formula">Hash_B = Decrypt( Chữ_Ký, PubKey )</div>`, 1400);
+
+      setTimeout(() => {
+        const cmpColor = isMatch ? 'var(--accent-green)' : 'var(--accent-red)';
+        const cmpIcon = isMatch ? '✅' : '❌';
+        const cmpText = isMatch ? 'TRÙNG KHỚP 100%' : 'LỆCH KÝ TỰ';
+
+        addVerifyStep(4, `<strong style="font-size:1rem;">⚖️ So Sánh Từng Ký Tự:</strong><br>
+          <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap;">
+            <div style="background:rgba(0,0,0,0.5);padding:6px 10px;border-radius:6px;border:1px solid var(--accent-blue);">
+              <span style="font-size:0.65rem;color:var(--text-muted);">Hash A:</span><br>
+              <span class="mono" style="font-size:0.78rem;color:var(--accent-blue);font-weight:700;">${hashA}</span>
+            </div>
+            <span style="font-size:1.3rem;color:${cmpColor};">${cmpIcon}</span>
+            <div style="background:rgba(0,0,0,0.5);padding:6px 10px;border-radius:6px;border:1px solid var(--accent-purple);">
+              <span style="font-size:0.65rem;color:var(--text-muted);">Hash B:</span><br>
+              <span class="mono" style="font-size:0.78rem;color:var(--accent-purple);font-weight:700;">${hashB}</span>
+            </div>
+          </div>`, 2100);
+
+        setTimeout(() => {
+          if (isMatch) {
+            addVerifyStep(5, `<div style="background:rgba(52,199,89,0.15);border:2px solid var(--accent-green);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:1.2rem;font-weight:700;color:var(--accent-green);">✅ HỢP LỆ</div>
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Văn bản nguyên vẹn & Người ký đúng chủ sở hữu Private Key</div>
+            </div>`, 0);
+          } else {
+            addVerifyStep(5, `<div style="background:rgba(255,59,48,0.15);border:2px solid var(--accent-red);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:1.2rem;font-weight:700;color:var(--accent-red);">❌ TỪ CHỐI</div>
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Văn bản bị sửa, hoặc Chữ ký giả mạo, hoặc Public Key không khớp</div>
+            </div>`, 0);
+          }
+        }, 2800);
+
+      }, 0);
+    }
+    // =========================================================================
+    // HASH SIMULATOR LOGIC
+    // =========================================================================
+    function textToBinary(text) {
+      let output = '';
+      for (let i = 0; i < text.length && i < 10; i++) {
+        output += text[i].charCodeAt(0).toString(2).padStart(8, '0') + ' ';
+      }
+      if (text.length > 10) output += '...';
+      return output;
+    }
+
+    let currentHashOption = 1;
+
+    function switchHashOption(opt) {
+      currentHashOption = opt;
+      document.getElementById('btnHashOption1').style.background = opt === 1 ? 'var(--accent-blue)' : 'transparent';
+      document.getElementById('btnHashOption1').style.color = opt === 1 ? 'white' : 'var(--text-muted)';
+      document.getElementById('btnHashOption2').style.background = opt === 2 ? 'var(--accent-purple)' : 'transparent';
+      document.getElementById('btnHashOption2').style.color = opt === 2 ? 'white' : 'var(--text-muted)';
+
+      document.getElementById('hashOpt1Desc').style.display = opt === 1 ? 'block' : 'none';
+      document.getElementById('hashOpt2Desc').style.display = opt === 2 ? 'block' : 'none';
+
+      document.getElementById('btnRunHash').className = opt === 1 ? 'btn btn-orange' : 'btn btn-purple';
+      document.getElementById('btnRunHash').innerHTML = opt === 1 ? '🔄 Bắt đầu Băm (SHA-256)' : '🔄 Bắt đầu Ánh xạ (Curve)';
+      
+      document.getElementById('hashSimFlow').style.display = 'none';
+      document.getElementById('hashCurveFlow').style.display = 'none';
+    }
+
+    function runHashSimulation() {
+      const input = document.getElementById('hashSimInput').value;
+      if (!input) { showToast('Vui lòng nhập văn bản vào ô Input!', 'error'); return; }
+
+      if (currentHashOption === 1) {
+        runSHA256Simulation(input);
+      } else {
+        runHashCurveSimulation(input);
+      }
+    }
+
+    function runSHA256Simulation(input) {
+      if (!input) { showToast('Vui lòng nhập văn bản vào ô Input!', 'error'); return; }
+
+      const flowBox = document.getElementById('hashSimFlow');
+      const s1 = document.getElementById('hs-step1');
+      const s2 = document.getElementById('hs-step2');
+      const s3 = document.getElementById('hs-step3');
+      const s4 = document.getElementById('hs-step4');
+      
+      const outBin = document.getElementById('hs-bin-out');
+      const outPad = document.getElementById('hs-pad-out');
+      const outFin = document.getElementById('hs-final-out');
+
+      // Reset
+      s1.style.opacity = '0'; s1.style.transform = 'translateY(10px)';
+      s2.style.opacity = '0'; s2.style.transform = 'translateY(10px)';
+      s3.style.opacity = '0'; s3.style.transform = 'translateY(10px)';
+      s4.style.opacity = '0'; s4.style.transform = 'translateY(10px)';
+      flowBox.style.display = 'flex';
+
+      // Step 1: Binary
+      let binStr = textToBinary(input);
+      if(!binStr) binStr = "00000000";
+      outBin.textContent = binStr;
+      
+      // Step 2: Padding
+      let padStr = binStr + ' 10000000 ... 00000000 ';
+      let bitLen = (input.length * 8).toString(2).padStart(64, '0');
+      // Show first and last bits
+      padStr += bitLen.substring(0, 16) + '...' + bitLen.substring(48);
+      outPad.innerHTML = `${binStr} <span style="color:var(--accent-red)">1000...000</span> <span style="color:var(--accent-green)">${bitLen.substring(0,8)}...${bitLen.substring(56)}</span>`;
+
+      // Step 4: Final hash
+      const finalHash = simpleHash(input);
+
+      // Animate steps
+      setTimeout(() => { s1.style.opacity = '1'; s1.style.transform = 'translateY(0)'; }, 100);
+      setTimeout(() => { s2.style.opacity = '1'; s2.style.transform = 'translateY(0)'; }, 800);
+      setTimeout(() => { s3.style.opacity = '1'; s3.style.transform = 'translateY(0)'; }, 1500);
+      setTimeout(() => { 
+        s4.style.opacity = '1'; s4.style.transform = 'translateY(0)'; 
+        outFin.textContent = finalHash;
+      }, 3500);
+    }
+
+    function runHashCurveSimulation(input) {
+      const flowBox = document.getElementById('hashCurveFlow');
+      const s1 = document.getElementById('hc-step1');
+      const s2 = document.getElementById('hc-step2');
+      const s3 = document.getElementById('hc-step3');
+      
+      const outX = document.getElementById('hc-x-out');
+      const outY = document.getElementById('hc-y-out');
+      const outFin = document.getElementById('hc-final-out');
+
+      // Reset
+      s1.style.opacity = '0'; s1.style.transform = 'translateY(10px)';
+      s2.style.opacity = '0'; s2.style.transform = 'translateY(10px)';
+      s3.style.opacity = '0'; s3.style.transform = 'translateY(10px)';
+      flowBox.style.display = 'flex';
+
+      // Step 1: Text -> Number X
+      let baseHash = simpleHash(input);
+      let xBase = parseInt(baseHash.substring(0, 4), 16) % 15; // Limit to [0, 14] for visualization
+      let x = xBase;
+      outX.textContent = `X = ${x}`;
+      
+      // Step 2: Find Y on y^2 = x^3 - 3x + 3
+      let y2 = x*x*x - 3*x + 3;
+      let iterations = 0;
+      let tryX = x;
+      
+      // Simulate finding a valid point
+      // (For y^2 = x^3-3x+3 over real numbers, if x >= 0, x^3-3x+3 is usually positive. 
+      //  But let's simulate checking if y^2 < 0 or making sure it's an integer for visual effect.
+      //  Actually, we'll just show it finding it immediately to keep it simple, or finding it on x+1 if y2 < 0).
+      
+      outY.textContent = `Đang thử X = ${tryX}...`;
+
+      setTimeout(() => { s1.style.opacity = '1'; s1.style.transform = 'translateY(0)'; }, 100);
+      
+      setTimeout(() => { 
+        s2.style.opacity = '1'; s2.style.transform = 'translateY(0)'; 
+        
+        let checkInt = setInterval(() => {
+          let curY2 = tryX*tryX*tryX - 3*tryX + 3;
+          if (curY2 >= 0) { // In real ECC, we check if it's a quadratic residue mod P
+            clearInterval(checkInt);
+            let y = Math.sqrt(curY2).toFixed(2);
+            outY.innerHTML = `Thử X = ${tryX} ➔ y² = ${curY2} <br><span style="color:var(--accent-green)">✅ Tìm thấy Y = ±${y}</span>`;
+            
+            // Draw on mini canvas
+            setTimeout(() => {
+              s3.style.opacity = '1'; s3.style.transform = 'translateY(0)';
+              outFin.textContent = `(${tryX}, ${y})`;
+              
+              // Simulate Hex Output
+              let prefix = y % 2 === 0 ? '02' : '03';
+              let xHex = simpleHash(tryX.toString()).substring(0, 64);
+              document.getElementById('hc-hash-out').textContent = prefix + xHex;
+              
+              drawHashCurvePoint(tryX, y);
+            }, 800);
+          } else {
+            outY.innerHTML = `Thử X = ${tryX} ➔ y² = ${curY2} (Âm) ❌<br>Tăng X lên ${tryX+1}...`;
+            tryX++;
+          }
+        }, 600);
+      }, 1000);
+    }
+
+    function drawHashCurvePoint(px_val, py_val) {
+      const cvs = document.getElementById('hashCurveCanvas');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width; const h = cvs.height;
+      ctx.clearRect(0, 0, w, h);
+      
+      ctx.strokeStyle = '#e5e5ea'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, h/2); ctx.lineTo(w, h/2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(w/4, 0); ctx.lineTo(w/4, h); ctx.stroke(); 
+      
+      ctx.strokeStyle = '#bf5af2'; ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      const scale = 8;
+      let first = true;
+      for (let px = 0; px <= w; px++) {
+        let lx = (px - w/4) / scale;
+        let ly2 = lx*lx*lx - 3*lx + 3;
+        if (ly2 >= 0) {
+          let ly = Math.sqrt(ly2);
+          let py = h/2 - ly * scale;
+          if (first) { ctx.moveTo(px, py); first = false; } else { ctx.lineTo(px, py); }
+        }
+      }
+      ctx.stroke();
+      ctx.beginPath();
+      first = true;
+      for (let px = 0; px <= w; px++) {
+        let lx = (px - w/4) / scale;
+        let ly2 = lx*lx*lx - 3*lx + 3;
+        if (ly2 >= 0) {
+          let ly = -Math.sqrt(ly2);
+          let py = h/2 - ly * scale;
+          if (first) { ctx.moveTo(px, py); first = false; } else { ctx.lineTo(px, py); }
+        }
+      }
+      ctx.stroke();
+
+      // Point
+      let pxx = w/4 + px_val * scale;
+      let pyy = h/2 - py_val * scale;
+      
+      ctx.fillStyle = '#34c759';
+      ctx.beginPath(); ctx.arc(pxx, pyy, 5, 0, 2*Math.PI); ctx.fill();
+      ctx.fillStyle = '#000'; ctx.font = '10px Inter'; ctx.fillText(`(${px_val}, ${py_val})`, pxx + 8, pyy);
+    }
+
+
+    // =========================================================================
+    // ELLIPTIC CURVE SIMULATION
+    // =========================================================================
+    function drawECCBase() {
+      const cvs = document.getElementById('eccCanvas');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width; const h = cvs.height;
+      ctx.clearRect(0, 0, w, h);
+      
+      // Draw axes
+      ctx.strokeStyle = '#e5e5ea'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, h/2); ctx.lineTo(w, h/2); ctx.stroke(); // X
+      ctx.beginPath(); ctx.moveTo(w/2, 0); ctx.lineTo(w/2, h); ctx.stroke(); // Y
+      
+      // Draw curve y^2 = x^3 - 3x + 3
+      ctx.strokeStyle = '#bf5af2'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      const scale = 25; // zoom level
+      let first = true;
+      for (let px = 0; px <= w; px++) {
+        let x = (px - w/2) / scale;
+        let y2 = x*x*x - 3*x + 3;
+        if (y2 >= 0) {
+          let y = Math.sqrt(y2);
+          let py = h/2 - y * scale;
+          if (first) { ctx.moveTo(px, py); first = false; }
+          else { ctx.lineTo(px, py); }
+        }
+      }
+      ctx.stroke();
+      
+      ctx.beginPath();
+      first = true;
+      for (let px = 0; px <= w; px++) {
+        let x = (px - w/2) / scale;
+        let y2 = x*x*x - 3*x + 3;
+        if (y2 >= 0) {
+          let y = -Math.sqrt(y2);
+          let py = h/2 - y * scale;
+          if (first) { ctx.moveTo(px, py); first = false; }
+          else { ctx.lineTo(px, py); }
+        }
+      }
+      ctx.stroke();
+    }
+
+    function runECCSimulation(type = 'doubling') {
+      drawECCBase();
+      const cvs = document.getElementById('eccCanvas');
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width; const h = cvs.height;
+      const scale = 25;
+      
+      document.getElementById('eccResultBox').style.display = 'none';
+      
+      if (type === 'doubling') {
+        // Point G (-1, sqrt(5))
+        let gx = -1; let gy = Math.sqrt(5);
+        let pxG = w/2 + gx * scale; let pyG = h/2 - gy * scale;
+        
+        ctx.fillStyle = '#f7931a';
+        ctx.beginPath(); ctx.arc(pxG, pyG, 6, 0, 2*Math.PI); ctx.fill();
+        ctx.fillStyle = '#000'; ctx.font = 'bold 14px Inter'; ctx.fillText('G', pxG - 20, pyG - 5);
+        
+        let ix = 2; let iy = Math.sqrt(5);
+        let pxI = w/2 + ix * scale; let pyI = h/2 - iy * scale;
+        
+        let rx = 2; let ry = -Math.sqrt(5);
+        let pxR = w/2 + rx * scale; let pyR = h/2 - ry * scale;
+
+        setTimeout(() => {
+          ctx.strokeStyle = '#bf5af2'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+          ctx.beginPath(); ctx.moveTo(pxG, pyG); ctx.lineTo(pxI, pyI); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#bf5af2';
+          ctx.beginPath(); ctx.arc(pxI, pyI, 4, 0, 2*Math.PI); ctx.fill();
+        }, 800);
+
+        setTimeout(() => {
+          ctx.strokeStyle = '#34c759'; ctx.lineWidth = 2; ctx.setLineDash([3, 3]);
+          ctx.beginPath(); ctx.moveTo(pxI, pyI); ctx.lineTo(pxR, pyR); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#34c759';
+          ctx.beginPath(); ctx.arc(pxR, pyR, 7, 0, 2*Math.PI); ctx.fill();
+          ctx.fillStyle = '#000'; ctx.font = 'bold 15px Inter'; ctx.fillText('2G', pxR + 10, pyR + 5);
+          
+          document.getElementById('eccResultTitle').textContent = 'Kết quả: Đã tìm ra 2G';
+          document.getElementById('eccResultBox').style.display = 'block';
+        }, 1600);
+        
+      } else if (type === 'addition') {
+        // Point P = (1, 1), Point Q = (-1, -sqrt(5))
+        let px = 1; let py = 1;
+        let qx = -1; let qy = -Math.sqrt(5);
+        
+        let cvsPx = w/2 + px * scale; let cvsPy = h/2 - py * scale;
+        let cvsQx = w/2 + qx * scale; let cvsQy = h/2 - qy * scale;
+
+        ctx.fillStyle = '#f7931a';
+        ctx.beginPath(); ctx.arc(cvsPx, cvsPy, 6, 0, 2*Math.PI); ctx.fill();
+        ctx.fillStyle = '#000'; ctx.font = 'bold 14px Inter'; ctx.fillText('P', cvsPx + 10, cvsPy - 5);
+        
+        ctx.fillStyle = '#4285F4';
+        ctx.beginPath(); ctx.arc(cvsQx, cvsQy, 6, 0, 2*Math.PI); ctx.fill();
+        ctx.fillStyle = '#000'; ctx.font = 'bold 14px Inter'; ctx.fillText('Q', cvsQx - 20, cvsQy + 15);
+
+        // Intersection Point (-R)
+        let ix = 2.618; let iy = 3.618;
+        let cvsIx = w/2 + ix * scale; let cvsIy = h/2 - iy * scale;
+
+        // Final Point R
+        let rx = 2.618; let ry = -3.618;
+        let cvsRx = w/2 + rx * scale; let cvsRy = h/2 - ry * scale;
+
+        setTimeout(() => {
+          ctx.strokeStyle = '#bf5af2'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+          ctx.beginPath(); ctx.moveTo(cvsQx, cvsQy); ctx.lineTo(cvsIx, cvsIy); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#bf5af2';
+          ctx.beginPath(); ctx.arc(cvsIx, cvsIy, 4, 0, 2*Math.PI); ctx.fill();
+        }, 800);
+
+        setTimeout(() => {
+          ctx.strokeStyle = '#34c759'; ctx.lineWidth = 2; ctx.setLineDash([3, 3]);
+          ctx.beginPath(); ctx.moveTo(cvsIx, cvsIy); ctx.lineTo(cvsRx, cvsRy); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#34c759';
+          ctx.beginPath(); ctx.arc(cvsRx, cvsRy, 7, 0, 2*Math.PI); ctx.fill();
+          ctx.fillStyle = '#000'; ctx.font = 'bold 15px Inter'; ctx.fillText('R (P+Q)', cvsRx + 10, cvsRy + 5);
+          
+          document.getElementById('eccResultTitle').textContent = 'Kết quả: Đã tìm ra R = P + Q';
+          document.getElementById('eccResultBox').style.display = 'block';
+        }, 1600);
+      }
+    }
+
+    // Auto-load scenario 1 on start
+    setTimeout(() => { loadScenario(1); }, 500);
+
+    // =========================================================================
     // UTILITIES
     // =========================================================================
     document.getElementById('speedSelect').addEventListener('change', (e) => { animSpeed = parseInt(e.target.value); });
@@ -1070,7 +2156,7 @@
       setTimeout(() => { toast.style.opacity = 0; setTimeout(() => toast.remove(), 300); }, 3000);
     }
     
-    window.onload = () => { initData(); updateUI(); switchSheet('home'); };
+    window.onload = () => { initData(); updateUI(); switchSheet('home'); setTimeout(drawECCBase, 500); };
   </script>
 </body>
 </html>
