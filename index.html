@@ -301,6 +301,22 @@
     /* Toast */
     .toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 2000; display: flex; flex-direction: column; gap: 12px; }
     .toast { background: rgba(40,40,45,0.95); backdrop-filter: blur(10px); padding: 16px 24px; border-radius: 12px; font-size: 0.95rem; font-weight: 500; border: 1px solid var(--border-color); color: white; box-shadow: 0 10px 40px rgba(0,0,0,0.5);}
+
+    /* ===== SLIDE VIEWER ===== */
+    .slide-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--border-light); cursor: pointer; transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .slide-dot:hover { background: white; transform: scale(1.2); }
+    .slide-dot.active { background: var(--accent-orange); transform: scale(1.3); box-shadow: 0 0 10px var(--accent-orange-glow); }
+    .slide-btn-nav {
+      position: absolute; width: 44px; height: 44px; border-radius: 50%; padding: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem; z-index: 10;
+      background: rgba(30, 30, 35, 0.6); backdrop-filter: blur(10px); border: 1px solid var(--border-color); color: white;
+      cursor: pointer; transition: all 0.3s;
+    }
+    .slide-btn-nav:hover { background: rgba(255, 255, 255, 0.15); border-color: var(--border-light); transform: scale(1.1); }
   </style>
 </head>
 <body>
@@ -314,6 +330,7 @@
     <div class="nav-menu">
       <div class="nav-item active" onclick="switchSheet('home')" id="nav-home">Trang Chủ</div>
       <div class="nav-item" onclick="switchSheet('theory')" id="nav-theory">Kiến Thức Nền Tảng</div>
+      <div class="nav-item" onclick="switchSheet('slides')" id="nav-slides">Slide Bài Giảng</div>
       <div class="nav-item" onclick="switchSheet('hash')" id="nav-hash">Hàm Băm (Hash)</div>
       <div class="nav-item" onclick="switchSheet('signature')" id="nav-signature">Chữ Ký Điện Tử</div>
       <div class="nav-item" onclick="switchSheet('demo')" id="nav-demo">Mô Phỏng Trực Quan</div>
@@ -399,6 +416,78 @@
         <div style="text-align: center; margin-top: 20px;">
           <button class="btn btn-primary" style="padding: 16px 40px; font-size:1.1rem; border-radius: 30px;" onclick="switchSheet('demo')">Tiến vào Mô Phỏng Tương Tác</button>
         </div>
+      </div>
+    </div>
+
+    <!-- SLIDES PAGE -->
+    <div id="sheet-slides" class="sheet" style="padding: 20px 40px; overflow: hidden; justify-content: center; align-items: center;">
+      <div class="sheet-inner" style="max-width: 1500px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+        
+        <!-- LOCK SCREEN -->
+        <div id="slidesLockScreen" class="glass-card" style="max-width: 500px; margin: auto; width: 100%; padding: 40px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; border-color: rgba(247,147,26,0.3); box-shadow: 0 10px 40px rgba(247,147,26,0.1);">
+          <div style="font-size: 3rem; margin-bottom: 10px;">🔒</div>
+          <h2 style="color: white; font-weight: 700; font-size: 1.6rem; letter-spacing: -0.5px;">Tài Liệu Bảo Mật</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">Vui lòng nhập mật khẩu của giảng viên để truy cập slide bài giảng tương tác.</p>
+          
+          <div class="input-group" style="width: 100%;">
+            <input type="password" id="slidesPasswordInput" placeholder="Nhập mật khẩu..." style="text-align: center; font-size: 1.1rem; letter-spacing: 4px; padding: 14px;" onkeydown="if(event.key==='Enter') submitSlidesPassword()">
+          </div>
+          
+          <button class="btn btn-orange" onclick="submitSlidesPassword()" style="width: 100%; padding: 14px; font-weight: 700;">MỞ KHÓA TÀI LIỆU</button>
+        </div>
+
+        <!-- CONTENT AREA (Initially hidden) -->
+        <div id="slidesContentArea" style="display: none; height: 100%; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h1 class="page-title" style="margin-bottom: 5px; font-size: 2.2rem;">Slide Bài Giảng</h1>
+              <p class="page-subtitle" style="margin-bottom: 0; font-size: 0.95rem;">Học phần trực quan sinh động - The Trust Revolution</p>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 12px;">
+              <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; white-space: nowrap;">Chọn Bài Giảng:</span>
+              <select id="deckSelectDropdown" onchange="switchDeck(this.value)" class="speed-select" style="min-width: 250px; padding: 8px 12px; border-radius: 8px; margin-bottom: 0;">
+                <!-- Will be populated dynamically -->
+              </select>
+              <button class="btn btn-secondary" onclick="lockSlides()" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 6px;">🔒 Khóa lại</button>
+            </div>
+          </div>
+          
+          <div style="display: flex; gap: 24px; flex: 1; min-height: 0; margin-bottom: 20px;">
+            <!-- Slide Image Panel (Stretches to fill space) -->
+            <div class="glass-card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 10px; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; position: relative;">
+              <button onclick="prevSlide()" class="slide-btn-nav" style="left: 16px;">‹</button>
+              <button onclick="nextSlide()" class="slide-btn-nav" style="right: 16px;">›</button>
+              
+              <img id="slideViewerImage" src="" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.6);" alt="Slide Image">
+            </div>
+            
+            <!-- Slide Notes & Content Panel (Fixed width sidebar) -->
+            <div class="glass-card" style="width: 320px; flex-shrink: 0; display: flex; flex-direction: column; padding: 24px; overflow-y: auto; background: rgba(20,20,25,0.7);">
+              <div style="font-size: 0.75rem; color: var(--accent-orange); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;" id="slideViewerIndicator">SLIDE 1 / 21</div>
+              <h2 id="slideViewerTitle" style="font-size: 1.4rem; color: white; margin-bottom: 16px; font-weight: 600; line-height: 1.3;">1. Kỷ Nguyên Của Niềm Tin</h2>
+              
+              <div style="border-top: 1px solid var(--border-color); padding-top: 16px; flex: 1;">
+                <h4 style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Văn Bản Quét OCR / Ghi Chú:</h4>
+                <p id="slideViewerText" style="font-size: 0.95rem; color: #d1d1d6; line-height: 1.6; white-space: pre-line;"></p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Bottom Timeline & Quick Jump Selector -->
+          <div class="glass-card" style="padding: 16px 24px; display: flex; align-items: center; gap: 20px; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+              <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Chọn nhanh Slide:</span>
+              <select id="slideSelectDropdown" onchange="jumpToSlide(parseInt(this.value))" class="speed-select" style="max-width: 250px; padding: 8px 12px; border-radius: 8px;">
+              </select>
+            </div>
+            
+            <!-- Dots indicator timeline -->
+            <div style="display: flex; gap: 6px; overflow-x: auto; max-width: 600px; padding: 4px 0;" id="slideDotsContainer">
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -539,19 +628,29 @@
               <div class="hash-step-icon" style="background: var(--accent-orange);">3</div>
               <div class="hash-step-content glass-card" style="flex: 1; padding: 16px;">
                 <h4 style="color: white; margin-bottom: 6px;">Bước 3: Hàm Nhào Trộn (Compression Function - 64 Vòng)</h4>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Dữ liệu bị băm vằm, xáo trộn (XOR, AND, dịch bit) qua 64 vòng lặp khép kín. Đây là nơi phép màu Tuyết lở (Avalanche Effect) xảy ra!</p>
-                <div style="background: rgba(247,147,26,0.1); border-left: 3px solid var(--accent-orange); padding: 10px; margin-bottom: 12px; font-size: 0.85rem; color: #fff;">
-                  <strong>Tại sao KHÔNG THỂ đảo ngược?</strong> Vì thuật toán sử dụng phép cộng tràn bit (Modulo 2³²) và phép dịch bit, làm <strong>mất mát dữ liệu gốc</strong> vĩnh viễn. Giống như bạn biết <code>A + B = 10</code>, bạn không thể tìm chính xác A và B là bao nhiêu.
-                </div>
-                <div style="display: flex; justify-content: center; margin: 12px 0;">
-                  <div style="display:flex; gap:8px; overflow:hidden; font-family:'JetBrains Mono'; font-size:0.85rem; background:rgba(0,0,0,0.5); padding:10px 16px; border-radius:8px; border:1px solid rgba(247,147,26,0.3); height:60px; align-items:center;">
-                    <div style="color:var(--accent-orange); animation: shiftBitsUp 0.8s infinite linear; display:flex; flex-direction:column; line-height:1.2;"><span>1011</span><span>0100</span><span>1101</span><span>0010</span></div>
-                    <div style="color:var(--accent-red); animation: shiftBitsDown 1s infinite linear; display:flex; flex-direction:column; line-height:1.2;"><span>0101</span><span>1010</span><span>1111</span><span>0000</span></div>
-                    <div style="color:var(--accent-green); animation: shiftBitsUp 0.6s infinite linear; display:flex; flex-direction:column; line-height:1.2;"><span>1100</span><span>0011</span><span>1001</span><span>0110</span></div>
-                    <div style="color:var(--accent-purple); animation: shiftBitsDown 0.9s infinite linear; display:flex; flex-direction:column; line-height:1.2;"><span>1000</span><span>0111</span><span>0010</span><span>1101</span></div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Dữ liệu bị băm vằm, xáo trộn qua các toán tử logic và dịch bit. Đây là nơi phép màu Tuyết lở (Avalanche Effect) xảy ra!</p>
+                <div style="display: flex; gap: 16px; margin: 12px 0;">
+                  <!-- VÌ SAO KHÔNG THỂ ĐẢO NGƯỢC -->
+                  <div style="flex: 1; background: rgba(255,59,48,0.1); border: 1px solid rgba(255,59,48,0.3); border-radius: 8px; padding: 12px;">
+                    <div style="font-weight: 600; color: var(--accent-red); margin-bottom: 8px; font-size: 0.9rem;">🚫 Vì sao KHÔNG THỂ đảo ngược?</div>
+                    <div style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #fff; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 6px;">
+                      Dịch phải (Shift Right):<br>
+                      <span style="color:var(--text-muted)">A = 1011 010<span style="color:var(--accent-red); text-decoration: line-through;">1</span></span><br>
+                      <span style="color:var(--accent-orange)">A >> 1 = 0101 1010</span><br>
+                      <span style="color:var(--accent-red); font-size: 0.75rem;">(Bit '1' bị tràn và rơi mất. Mất dữ liệu vĩnh viễn!)</span>
+                    </div>
+                  </div>
+                  <!-- VÌ SAO DỄ KIỂM TRA -->
+                  <div style="flex: 1; background: rgba(52,199,89,0.1); border: 1px solid rgba(52,199,89,0.3); border-radius: 8px; padding: 12px;">
+                    <div style="font-weight: 600; color: var(--accent-green); margin-bottom: 8px; font-size: 0.9rem;">⚡ Vì sao DỄ KIỂM TRA (Tính xuôi)?</div>
+                    <div style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #fff; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 6px; display: flex; flex-direction: column; gap: 4px;">
+                      <div style="color:var(--text-muted)">X = <span id="hs-mix-x">1011</span></div>
+                      <div style="color:var(--text-muted)">Y = <span id="hs-mix-y">0101</span></div>
+                      <div style="color:var(--accent-green)">X ⊕ Y = <span id="hs-mix-res">1110</span></div>
+                      <div style="color:var(--accent-green); font-size: 0.75rem; margin-top: 4px;">(Máy tính chạy phép Logic xuôi siêu nhanh)</div>
+                    </div>
                   </div>
                 </div>
-                <div class="sig-formula" style="color: var(--accent-orange); border-color: rgba(247,147,26,0.3); background: rgba(247,147,26,0.1);">Ch, Maj, Σ0, Σ1, σ0, σ1 (Các toán tử Logic)</div>
               </div>
             </div>
 
@@ -562,7 +661,7 @@
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Chuỗi cuối cùng được xuất ra dưới dạng hệ cơ số 16 (Hexadecimal) cho con người dễ đọc.</p>
                 <div id="hs-final-out" class="mono" style="font-size: 1.1rem; color: white; word-break: break-all; background: rgba(0,0,0,0.6); padding: 16px; border-radius: 8px; text-align: center; letter-spacing: 1px; margin-bottom: 12px;"></div>
                 <div style="background: rgba(52,199,89,0.1); border-left: 3px solid var(--accent-green); padding: 10px; font-size: 0.85rem; color: #fff;">
-                  <strong>Tại sao DỄ KIỂM TRA <code>f(x)</code>?</strong> Vì bản chất thuật toán chỉ là các phép toán logic cơ bản. Máy tính đi theo một chiều <strong>từ trên xuống dưới</strong> để tính toán mất chưa tới 0.001 giây. Nhờ thế người xác thực kiểm tra lại cực kỳ nhanh!
+                  Khi đối chiếu chữ ký, người xác thực chỉ cần ráp <strong>Văn bản</strong> vào hàm băm đi xuôi một lần duy nhất là ra ngay kết quả trên, nhanh như một cái chớp mắt.
                 </div>
               </div>
             </div>
@@ -641,11 +740,14 @@
                   Công thức: <code class="mono" style="font-size:0.9rem; background:rgba(0,0,0,0.5); padding:4px; border-radius:4px;">K = k * G</code>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
-                  <button class="btn" onclick="runECCSimulation('doubling')" style="width: 100%; padding: 12px; font-size: 0.9rem; background: rgba(191,90,242,0.2); border: 1px solid var(--accent-purple); color: white;">
+                  <button class="btn" onclick="runECCSimulation('doubling')" style="width: 100%; padding: 10px; font-size: 0.85rem; background: rgba(191,90,242,0.2); border: 1px solid var(--accent-purple); color: white;">
                     ▶ Điểm Nhân Đôi (Point Doubling): G + G = 2G
                   </button>
-                  <button class="btn" onclick="runECCSimulation('addition')" style="width: 100%; padding: 12px; font-size: 0.9rem; background: rgba(41,151,255,0.2); border: 1px solid var(--accent-blue); color: white;">
+                  <button class="btn" onclick="runECCSimulation('addition')" style="width: 100%; padding: 10px; font-size: 0.85rem; background: rgba(41,151,255,0.2); border: 1px solid var(--accent-blue); color: white;">
                     ▶ Cộng Hai Điểm (Point Addition): P + Q = R
+                  </button>
+                  <button class="btn" onclick="runECCSimulation('multiplication')" style="width: 100%; padding: 10px; font-size: 0.85rem; background: rgba(247,147,26,0.2); border: 1px solid var(--accent-orange); color: white;">
+                    ▶ Phép Nhân Điểm (Point Mult): k * G (k=3)
                   </button>
                 </div>
               </div>
@@ -1188,6 +1290,20 @@
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       document.getElementById('sheet-' + sheetId).classList.add('active');
       document.getElementById('nav-' + sheetId).classList.add('active');
+      
+      if (sheetId === 'slides') {
+        if (isSlidesUnlocked) {
+          document.getElementById('slidesLockScreen').style.display = 'none';
+          document.getElementById('slidesContentArea').style.display = 'flex';
+        } else {
+          document.getElementById('slidesLockScreen').style.display = 'flex';
+          document.getElementById('slidesContentArea').style.display = 'none';
+          setTimeout(() => {
+            const pwdInput = document.getElementById('slidesPasswordInput');
+            if (pwdInput) pwdInput.focus();
+          }, 100);
+        }
+      }
     }
 
     function jumpToStep(step) {
@@ -1877,6 +1993,20 @@
       padStr += bitLen.substring(0, 16) + '...' + bitLen.substring(48);
       outPad.innerHTML = `${binStr} <span style="color:var(--accent-red)">1000...000</span> <span style="color:var(--accent-green)">${bitLen.substring(0,8)}...${bitLen.substring(56)}</span>`;
 
+      // Step 3 Animation Logic
+      let mixInterval = setInterval(() => {
+        let x = Math.floor(Math.random()*16).toString(2).padStart(4,'0');
+        let y = Math.floor(Math.random()*16).toString(2).padStart(4,'0');
+        let res = '';
+        for(let i=0; i<4; i++) res += (x[i] === y[i] ? '0' : '1');
+        let xEl = document.getElementById('hs-mix-x');
+        let yEl = document.getElementById('hs-mix-y');
+        let rEl = document.getElementById('hs-mix-res');
+        if(xEl) xEl.textContent = x;
+        if(yEl) yEl.textContent = y;
+        if(rEl) rEl.textContent = res;
+      }, 150);
+
       // Step 4: Final hash
       const finalHash = simpleHash(input);
 
@@ -1885,9 +2015,10 @@
       setTimeout(() => { s2.style.opacity = '1'; s2.style.transform = 'translateY(0)'; }, 800);
       setTimeout(() => { s3.style.opacity = '1'; s3.style.transform = 'translateY(0)'; }, 1500);
       setTimeout(() => { 
+        clearInterval(mixInterval);
         s4.style.opacity = '1'; s4.style.transform = 'translateY(0)'; 
         outFin.textContent = finalHash;
-      }, 3500);
+      }, 4000);
     }
 
     function runHashCurveSimulation(input) {
@@ -2140,9 +2271,275 @@
         }, 1600);
       }
     }
+          
+        // =========================================================================
+    // SLIDE VIEWER LOGIC (BẢO MẬT & ĐA BÀI GIẢNG)
+    // =========================================================================
+    let isSlidesUnlocked = false;
+    let currentSlideIdx = 0;
+    let activeDeckKey = 'trust_revolution';
 
-    // Auto-load scenario 1 on start
-    setTimeout(() => { loadScenario(1); }, 500);
+    const slideDecks = {
+      trust_revolution: {
+        title: "The Trust Revolution - Cuộc Cách Mạng Niềm Tin",
+        slides: [
+          {
+            image: "extracted_slides/slide_1_image_1.png",
+            title: "Kỷ Nguyên Của Niềm Tin",
+            text: "Kỷ Nguyên Của Niềm Tin - Từ Ảo Tưởng Kiểm Soát Đến Cuộc Cách Mạng Phi Tập Trung\n\nBài giảng trực quan sinh động về Bitcoin Blockchain Masterclass.\nGiảng viên: Mr. WIN (@winchannel5326)"
+          },
+          {
+            image: "extracted_slides/slide_2_image_1.png",
+            title: "Kiến Trúc Tập Trung",
+            text: "Kiến Trúc Tập Trung (Centralized):\nMọi dữ liệu, quyền lực và giao dịch đều xoay quanh một lõi duy nhất."
+          },
+          {
+            image: "extracted_slides/slide_3_image_1.png",
+            title: "Sức Mạnh Của Lõi Trung Tâm",
+            text: "Sức Mệnh Của Lõi Trung Tâm:\n- Tốc độ xử lý tối đa.\n- Dễ dàng nâng cấp và bảo trì.\n- Trải nghiệm người dùng đồng nhất."
+          },
+          {
+            image: "extracted_slides/slide_4_image_1.png",
+            title: "Tử Huyệt Của Mô Hình Tập Trung",
+            text: "Tử Huyệt Của Mô Hình Tập Trung:\n- Single Point of Failure (Điểm chết duy nhất).\n- Quyền lực tuyệt đối = Rủi ro tuyệt đối.\n- \"Khi mạng lưới là đồng nhất, một cuộc tấn công vào một phần mạng lưới sẽ phá hủy toàn bộ hệ thống.\" — NIST Report 8202."
+          },
+          {
+            image: "extracted_slides/slide_5_image_1.png",
+            title: "Giấc Mơ Mạng Ngang Hàng",
+            text: "Giấc Mơ Mạng Ngang Hàng (Peer-to-peer):\nMột hệ thống không có vị vua nào cai trị."
+          },
+          {
+            image: "extracted_slides/slide_6_image_1.png",
+            title: "Hai Lối Duy Trì Hệ Thống",
+            text: "Hai Lối Duy Trì Hệ Thống:\n\n1. Hệ thống Tập trung:\n- Niềm tin: Đặt vào Con người/Tổ chức.\n- Điểm tử huyệt: Một điểm duy nhất (Single Point).\n- Luật lệ: Độc tài (Dictatorship).\n- Tốc độ: Nhanh, hiệu suất cao.\n\n2. Hệ thống Phi tập trung:\n- Niềm tin: Đặt vào Toán học (Mật mã).\n- Điểm tử huyệt: Không có (No Single Point).\n- Luật lệ: Đồng thuận (Consensus).\n- Tốc độ: Chậm, tốn kém tài nguyên."
+          },
+          {
+            image: "extracted_slides/slide_7_image_1.png",
+            title: "Rào Cản 1: Vấn Đề Trùng Chi",
+            text: "Rào Cản 1: Vấn Đề Trùng Chi (Double-Spending):\nTiền thuật số thực chất chỉ là dữ liệu.\nNếu không có ngân hàng, ai cấm Alice sao chép file tiền này gửi cho cả Bob và Charlie cùng lúc?"
+          },
+          {
+            image: "extracted_slides/slide_8_image_1.png",
+            title: "Rào Cản 2: Cơn Ác Mộng Đồng Thuận",
+            text: "Rào Cản 2: Cơn Ác Mộng Đồng Thuận (Out of Sync):\nLưu trữ Sổ cái phân tán tốn kém chi phí khổng lồ.\nLàm sao để một mạng lưới những người lạ mặt, ẩn danh thống nhất được một phiên bản sổ cái thật duy nhất?"
+          },
+          {
+            image: "extracted_slides/slide_9_image_1.png",
+            title: "Lời Giải Của Satoshi Nakamoto",
+            text: "Lời Giải Của Satoshi Nakamoto:\n- Toán học ngăn chặn sự gian lận.\n- Kinh tế học vinh danh sự trung thực.\n- \"Một hệ thống thanh toán điện tử dựa trên chứng cứ mật mã thay vì niềm tin.\" — Bitcoin Whitepaper."
+          },
+          {
+            image: "extracted_slides/slide_10_image_1.png",
+            title: "Hộp Đồ Nghề Kỹ Thuật",
+            text: "Hộp Đồ Nghề Kỹ Thuật (The Toolbox):\nNhững viên gạch nền móng kiến tạo nên cơ sở hạ tầng của Niềm tin:\n1. Hash (Hàm băm - Máy xay thịt)\n2. Chữ số / Chữ ký số (Con dấu sáp)\n3. Merkle Tree (Cây nén)\n4. Proof of Work (Vé số mật mã)\n5. Consensus (Luật đồng thuận)"
+          },
+          {
+            image: "extracted_slides/slide_11_image_1.png",
+            title: "1. Hàm Băm (Hash) - SHA-256",
+            text: "1. Hàm Băm (Hash): Máy Xay Thịt Một Chiều SHA-256:\n- Đầu vào có kích thước bất kỳ -> Đầu ra là một chuỗi 64 ký tự cố định.\n- Đặc tính: Không thể dịch ngược. Sai 1 dấu chấm, mã Hash thay đổi hoán toàn.\n- Công dụng: Dấu vân tay kỹ thuật số của dữ liệu."
+          },
+          {
+            image: "extracted_slides/slide_12_image_1.png",
+            title: "2. Chữ Ký Số",
+            text: "2. Chữ Ký Số: Con Dấu Sáp Tuyệt Đối:\n- Private Key (Khóa riêng tư): Con dấu chỉ bạn cầm. Tuyệt đối bí mật.\n- Public Key (Khóa công khai): Bản in sáp công khai. Ai cũng có thể xem.\n- Công dụng: Chứng minh \"Tôi thực sự là chủ của số tiền này\" mà không cần lộ mật khẩu."
+          },
+          {
+            image: "extracted_slides/slide_13_image_1.png",
+            title: "3. Cây Merkle (Merkle Tree)",
+            text: "3. Cây Merkle (Merkle Tree): Zipped File Của Sự Thật:\n- Hàng ngàn giao dịch được nén dần lên một đỉnh duy nhất (Root Hash).\n- Chỉ cần đối chiếu 1 mã băm trên đỉnh để xác thực toàn bộ lịch sử bên dưới."
+          },
+          {
+            image: "extracted_slides/slide_14_image_1.png",
+            title: "4 & 5. Proof of Work & Đồng Thuận",
+            text: "4 & 5. Proof of Work & Luật Đồng Thuận:\n- PoW: Tấm vé số mật mã được mua bằng năng lượng Điện. Tìm ra mã Hash bắt đầu bằng các số 0.\n- Đồng thuận: 1 CPU = 1 Phiếu bầu. Chuỗi nào dài nhất, tốn nhiều điện năng nhất = Sự thật."
+          },
+          {
+            image: "extracted_slides/slide_15_image_1.png",
+            title: "Vòng Đời Giao Dịch: Khởi Tạo",
+            text: "Vòng Đời Giao Dịch: Alice gửi 1 BTC cho Bob:\n- Bước 1: Ký giao dịch. Alice muốn gửi 1 BTC cho Bob. Cô dùng Private Key đóng dấu xác thực.\n- Bước 2: Broadcast. Giao dịch được ném vào phòng chờ (Mempool) của mạng lưới ngang hàng."
+          },
+          {
+            image: "extracted_slides/slide_16_image_1.png",
+            title: "Vòng Đời Giao Dịch: Đóng Gói & Đào",
+            text: "Vòng Đời Giao Dịch: Đóng Gói & Đào Block:\n- Bước 3: Gom cụm. Các thợ đào (Miners) nhặt giao dịch của Alice, nén vào Merkle Tree để tạo 1 Block mới.\n- Bước 4: Cuộc đua PoW. Hàng triệu máy tính vắt kiệt sức chạy đua giải mã Hash để giành quyền xác thực Block."
+          },
+          {
+            image: "extracted_slides/slide_17_image_1.png",
+            title: "Vòng Đời Giao Dịch: Khóa Chặt & Ghi Sổ",
+            text: "Vòng Đời Giao Dịch: Khóa Chặt & Cập Nhật Sổ Cái:\n- Bước 5: Thẩm định. Thợ đào thắng cuộc phát khối ra. Mạng lưới tự động kiểm tra chữ ký và mã băm. Block được móc vào Blockchain. Không thể đảo ngược. Bob nhận được tiền."
+          },
+          {
+            image: "extracted_slides/slide_18_image_1.png",
+            title: "Giới Hạn Của Blockchain v1",
+            text: "Giới Hạn Của Vòng Kỹ Thuật Số (Blockchain v1):\n- Bitcoin là một kiệt tác, nhưng nó chỉ là một máy tính bỏ túi.\n- Ngôn ngữ kịch bản (Scripting) bị giới hạn cố ý để đảm bảo bảo mật tuyệt đối.\n- Chỉ phục vụ 1 mục đích duy nhất: Chuyển tiền."
+          },
+          {
+            image: "extracted_slides/slide_19_image_1.png",
+            title: "Bước Nhảy Vọt Sang Blockchain v2",
+            text: "Bước Nhảy Vọt Sang Blockchain v2: Máy Tính Toàn Cầu (DeFi, DAOs):\n- Ethereum ra đời, biến Máy tính bỏ túi thành Smartphone.\n- Smart Contract (Hợp đồng thông minh): Các đoạn code tự thực thi không thể can thiöp.\n- DApps: Kỷ nguyên của ứng dụng phi tập trung."
+          },
+          {
+            image: "extracted_slides/slide_20_image_1.png",
+            title: "Tiến Hóa Của Blockchain",
+            text: "Tiến Hóa Của Blockchain:\n\n1. Bitcoin (Thế hệ 1):\n- Đặc tính: Tiền / Vàng Số.\n- Định vị: Script (Không đầy đủ Turing).\n- Ngôn ngữ: Các giao dịch tài chính đơn giản.\n\n2. Ethereum (Thế hệ 2):\n- Đặc tính: Siêu Máy Tính Toàn Cầu.\n- Định vị: Solidity (Đầy đủ Turing).\n- Ngôn ngữ: Hợp đồng thông minh & DApps."
+          },
+          {
+            image: "extracted_slides/slide_21_image_1.png",
+            title: "Kết Luận: Code = Trust",
+            text: "Code = Trust: Sự Dịch Chuyển Vĩ Đại:\nLần đầu tiên trong lịch sử loài người, chúng ta có thể tạo ra Niềm Tin bằng Toán Học."
+          }
+        ]
+      },
+      cryptography_advanced: {
+        title: "Chuyên Đề Mật Mã Học Nâng Cao (Demo khóa học mới)",
+        slides: [
+          {
+            image: "extracted_slides/slide_10_image_1.png",
+            title: "Mật Mã Học & Các Khóa Học Mới",
+            text: "Bài giảng nâng cao về Mật mã học (Cryptography Basics):\n\nĐây là bộ slide mẫu thứ 2 để chứng minh tính năng quản lý nhiều khóa học khác nhau trên trang của Mr. WIN.\n\nNội dung chi tiết sẽ được tự động cập nhật đồng bộ khi bạn thêm hình ảnh và text tương ứng."
+          },
+          {
+            image: "extracted_slides/slide_11_image_1.png",
+            title: "Hàm Băm Mật Mã Học nâng cao",
+            text: "Học phần nghiên cứu chuyên sâu về các dạng mã băm, tính kháng va chạm và ứng dụng của cây Merkle trong cấu trúc blockchain."
+          }
+        ]
+      }
+    };
+
+    function initSlideViewer() {
+      // Populate Decks dropdown
+      const deckDropdown = document.getElementById('deckSelectDropdown');
+      deckDropdown.innerHTML = Object.keys(slideDecks).map(key => `
+        <option value="${key}">${slideDecks[key].title}</option>
+      `).join('');
+      deckDropdown.value = activeDeckKey;
+      
+      loadDeck(activeDeckKey);
+    }
+    
+    function loadDeck(deckKey) {
+      activeDeckKey = deckKey;
+      currentSlideIdx = 0;
+      
+      const slides = slideDecks[deckKey].slides;
+      const dropdown = document.getElementById('slideSelectDropdown');
+      const dotsContainer = document.getElementById('slideDotsContainer');
+      
+      // Populate dropdown
+      dropdown.innerHTML = slides.map((s, idx) => `
+        <option value="${idx}">Slide ${idx + 1}: ${s.title.substring(0, 25)}...</option>
+      `).join('');
+      
+      // Populate dots
+      dotsContainer.innerHTML = slides.map((_, idx) => `
+        <div class="slide-dot" id="slide-dot-${idx}" onclick="jumpToSlide(${idx})" title="Slide ${idx + 1}"></div>
+      `).join('');
+      
+      updateSlideViewer();
+    }
+    
+    function switchDeck(deckKey) {
+      if (slideDecks[deckKey]) {
+        loadDeck(deckKey);
+        showToast(`Đã tải bài giảng: ${slideDecks[deckKey].title}`, 'success');
+      }
+    }
+    
+    function updateSlideViewer() {
+      const slides = slideDecks[activeDeckKey].slides;
+      const slide = slides[currentSlideIdx];
+      
+      // Update image, title, text, and indicator
+      document.getElementById('slideViewerImage').src = slide.image;
+      document.getElementById('slideViewerTitle').textContent = `${currentSlideIdx + 1}. ${slide.title}`;
+      document.getElementById('slideViewerText').textContent = slide.text;
+      document.getElementById('slideViewerIndicator').textContent = `SLIDE ${currentSlideIdx + 1} / ${slides.length}`;
+      
+      // Update dropdown
+      document.getElementById('slideSelectDropdown').value = currentSlideIdx;
+      
+      // Update dots active class
+      document.querySelectorAll('.slide-dot').forEach((dot, idx) => {
+        if (idx === currentSlideIdx) dot.classList.add('active');
+        else dot.classList.remove('active');
+      });
+      
+      // Auto-scroll the dots container to keep the active dot visible
+      const activeDot = document.getElementById(`slide-dot-${currentSlideIdx}`);
+      if (activeDot) {
+        activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+    
+    function nextSlide() {
+      const slides = slideDecks[activeDeckKey].slides;
+      if (currentSlideIdx < slides.length - 1) {
+        currentSlideIdx++;
+        updateSlideViewer();
+      } else {
+        showToast('Đã đến slide cuối cùng!', 'info');
+      }
+    }
+    
+    function prevSlide() {
+      if (currentSlideIdx > 0) {
+        currentSlideIdx--;
+        updateSlideViewer();
+      } else {
+        showToast('Đây là slide đầu tiên!', 'info');
+      }
+    }
+    
+    function jumpToSlide(idx) {
+      const slides = slideDecks[activeDeckKey].slides;
+      if (idx >= 0 && idx < slides.length) {
+        currentSlideIdx = idx;
+        updateSlideViewer();
+      }
+    }
+
+    // Password validation logic
+    function submitSlidesPassword() {
+      const password = document.getElementById('slidesPasswordInput').value;
+      if (password === '123') {
+        isSlidesUnlocked = true;
+        document.getElementById('slidesLockScreen').style.display = 'none';
+        document.getElementById('slidesContentArea').style.display = 'flex';
+        showToast('Mở khóa tài liệu bài giảng thành công!', 'success');
+        initSlideViewer();
+      } else {
+        showToast('Mật khẩu không chính xác! Vui lòng thử lại.', 'error');
+        document.getElementById('slidesPasswordInput').value = '';
+        document.getElementById('slidesPasswordInput').focus();
+      }
+    }
+    
+    function lockSlides() {
+      isSlidesUnlocked = false;
+      document.getElementById('slidesPasswordInput').value = '';
+      document.getElementById('slidesLockScreen').style.display = 'flex';
+      document.getElementById('slidesContentArea').style.display = 'none';
+      showToast('Đã khóa tài liệu slide.', 'info');
+      setTimeout(() => {
+        const pwdInput = document.getElementById('slidesPasswordInput');
+        if (pwdInput) pwdInput.focus();
+      }, 100);
+    }
+
+    // Keyboard events for slide navigation
+    document.addEventListener('keydown', (e) => {
+      const slidesSheet = document.getElementById('sheet-slides');
+      if (slidesSheet && slidesSheet.classList.contains('active') && isSlidesUnlocked) {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+          e.preventDefault();
+          nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          prevSlide();
+        }
+      }
+    });
 
     // =========================================================================
     // UTILITIES
