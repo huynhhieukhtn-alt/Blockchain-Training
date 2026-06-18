@@ -420,8 +420,8 @@
     </div>
 
     <!-- SLIDES PAGE -->
-    <div id="sheet-slides" class="sheet" style="padding: 20px 40px; overflow: hidden; justify-content: center; align-items: center;">
-      <div class="sheet-inner" style="max-width: 1500px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+    <div id="sheet-slides" class="sheet" style="padding: 20px; overflow: hidden; justify-content: center; align-items: center;">
+      <div class="sheet-inner" style="max-width: 100%; width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column;">
         
         <!-- LOCK SCREEN -->
         <div id="slidesLockScreen" class="glass-card" style="max-width: 500px; margin: auto; width: 100%; padding: 40px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; border-color: rgba(247,147,26,0.3); box-shadow: 0 10px 40px rgba(247,147,26,0.1);">
@@ -437,7 +437,7 @@
         </div>
 
         <!-- CONTENT AREA (Initially hidden) -->
-        <div id="slidesContentArea" style="display: none; height: 100%; flex-direction: column;">
+        <div id="slidesContentArea" style="display: none; flex: 1; min-height: 0; flex-direction: column;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div>
               <h1 class="page-title" style="margin-bottom: 5px; font-size: 2.2rem;">Slide Bài Giảng</h1>
@@ -455,15 +455,15 @@
           
           <div style="display: flex; gap: 24px; flex: 1; min-height: 0; margin-bottom: 20px;">
             <!-- Slide Image Panel (Stretches to fill space) -->
-            <div class="glass-card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 10px; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; position: relative;">
+            <div class="glass-card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; min-width: 0; padding: 10px; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; position: relative;">
               <button onclick="prevSlide()" class="slide-btn-nav" style="left: 16px;">‹</button>
               <button onclick="nextSlide()" class="slide-btn-nav" style="right: 16px;">›</button>
               
-              <img id="slideViewerImage" src="" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.6);" alt="Slide Image">
+              <img id="slideViewerImage" src="" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.6);" alt="Slide Image">
             </div>
             
-            <!-- Slide Notes & Content Panel (Fixed width sidebar) -->
-            <div class="glass-card" style="width: 320px; flex-shrink: 0; display: flex; flex-direction: column; padding: 24px; overflow-y: auto; background: rgba(20,20,25,0.7);">
+            <!-- Slide Notes & Content Panel (Responsive sidebar) -->
+            <div class="glass-card" style="width: 25%; min-width: 320px; max-width: 450px; flex-shrink: 0; display: flex; flex-direction: column; padding: 24px; overflow-y: auto; background: rgba(20,20,25,0.7);">
               <div style="font-size: 0.75rem; color: var(--accent-orange); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;" id="slideViewerIndicator">SLIDE 1 / 21</div>
               <h2 id="slideViewerTitle" style="font-size: 1.4rem; color: white; margin-bottom: 16px; font-weight: 600; line-height: 1.3;">1. Kỷ Nguyên Của Niềm Tin</h2>
               
@@ -940,7 +940,7 @@
 
     <!-- DEMO PAGE -->
     <div id="sheet-demo" class="sheet">
-      <div class="sheet-inner" style="height: 100%; display: flex; flex-direction: column;">
+      <div class="sheet-inner" style="max-width: 100%; width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column;">
         
         <!-- PERMANENT WALLET HEADER -->
         <div class="wallet-header" id="walletHeaderBar"></div>
@@ -1090,7 +1090,7 @@
 
     <!-- DASHBOARD PAGE -->
     <div id="sheet-dashboard" class="sheet">
-      <div class="sheet-inner">
+      <div class="sheet-inner" style="max-width: 100%; width: 100%;">
         <h1 class="page-title">Sổ Cái Hệ Thống</h1>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px;">
           <div class="glass-card" style="padding: 24px; text-align: center;">
