@@ -1146,7 +1146,7 @@
         <p class="page-subtitle">Xem trực tiếp các bài giảng mới nhất từ kênh Youtube của Mr. WIN.</p>
         
         <div class="video-container" id="videoIframeContainer" style="margin-top: 10px; margin-bottom: 24px;">
-          <iframe id="videoIframe" src="./yt-proxy.html?v=odrUS5voxVo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          <iframe id="videoIframe" src="https://www.youtube.com/embed/odrUS5voxVo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
         
         <div class="glass-card" style="padding: 24px; border-left: 4px solid #ff0000;">
@@ -2475,7 +2475,7 @@
       document.getElementById('videoTitle').textContent = v.title;
       document.getElementById('videoDesc').textContent = v.desc;
       document.getElementById('videoLinkBtn').href = v.shareUrl;
-      document.getElementById('videoIframe').src = './yt-proxy.html?v=' + v.embedId;
+      document.getElementById('videoIframe').src = 'https://www.youtube.com/embed/' + v.embedId;
     }
 
     function initSlideViewer() {
